@@ -22,7 +22,7 @@
 from openerp.osv import fields, orm
 
 
-class purchase_order_line(orm.Model):
+class PurchaseOrderLine(orm.Model):
 
     def _invoiced_qty(self, cursor, user, ids, name, arg, context=None):
         res = {}

@@ -37,6 +37,5 @@ for each line, the quantity to invoice.
         'purchase_view.xml',
     ],
     "demo": [],
-    "active": False,
     "installable": True
 }

@@ -25,7 +25,7 @@ import openerp.addons.decimal_precision as dp
 from openerp.tools.translate import _
 
 
-class purchase_line_invoice(orm.TransientModel):
+class PurchaseLineInvoice(orm.TransientModel):
 
     _inherit = 'purchase.order.line_invoice'
 
@@ -35,7 +35,7 @@ class purchase_line_invoice(orm.TransientModel):
     }
 
     def default_get(self, cr, uid, fields, context=None):
-        po_line_obj = self.pool.get('purchase.order.line')
+        po_line_obj = self.pool['purchase.order.line']
         lines = []
         for po_line in po_line_obj.browse(cr, uid,
                                           context.get('active_ids', []),
@@ -46,7 +46,7 @@ class purchase_line_invoice(orm.TransientModel):
                 'invoiced_qty': po_line.product_qty - po_line.invoiced_qty,
                 'price_unit': po_line.price_unit,
             })
-        defaults = super(purchase_line_invoice, self).default_get(
+        defaults = super(PurchaseLineInvoice, self).default_get(
             cr, uid, fields, context=context)
         defaults['line_ids'] = lines
         return defaults
@@ -72,7 +72,7 @@ class purchase_line_invoice(orm.TransientModel):
             line.po_line_id.write({
                 'product_qty': line.invoiced_qty,
             })
-        res = super(purchase_line_invoice, self).makeInvoices(
+        res = super(PurchaseLineInvoice, self).makeInvoices(
             cr, uid, ids, context=context)
         for po_line_id in changed_lines:
             po_line = purchase_line_obj.browse(cr, uid, po_line_id,
@@ -85,7 +85,7 @@ class purchase_line_invoice(orm.TransientModel):
         return res
 
 
-class purchase_line_invoice_line(orm.TransientModel):
+class PurchaseLineInvoiceLine(orm.TransientModel):
 
     _name = 'purchase.order.line_invoice.line'
 
