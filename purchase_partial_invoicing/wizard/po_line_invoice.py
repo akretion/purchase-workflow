@@ -55,7 +55,7 @@ class PurchaseLineInvoice(orm.TransientModel):
         if context is None:
             context = {}
         wizard = self.browse(cr, uid, ids[0], context=context)
-        purchase_line_obj = self.pool.get('purchase.order.line')
+        purchase_line_obj = self.pool['purchase.order.line']
         changed_lines = {}
         context['active_ids'] = []
         for line in wizard.line_ids:
@@ -106,3 +106,19 @@ class PurchaseLineInvoiceLine(orm.TransientModel):
                 'Product Unit of Measure')),
         'wizard_id': fields.many2one('purchase.order.line_invoice', 'Wizard'),
     }
+
+
+class AccountInvoice(orm.Model):
+    _inherit = 'account.invoice'
+
+    def invoice_validate(self, cr, uid, ids, context=None):
+        purchase_order_obj = self.pool['purchase.order']
+        res = super(AccountInvoice, self).invoice_validate(
+            cr, uid, ids, context=context)
+        po_ids = purchase_order_obj.search(
+            cr, uid, [('invoice_ids', 'in', ids)], context=context)
+        for purchase_order in purchase_order_obj.browse(cr, uid, po_ids, context=context):
+            for po_line in purchase_order.order_line:
+                if po_line.invoiced_qty != po_line.product_qty:
+                        po_line.write({'invoiced': False})
+        return res
