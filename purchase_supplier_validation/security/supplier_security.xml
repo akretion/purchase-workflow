@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="0">
+
+        <!-- group -->
+        <record id="res_groups_supplier" model="res.groups">
+            <field name="name">Supplier</field>
+        </record>
+
+        <!-- ir.rule -->
+        <record model="ir.rule" id="purchase_supplier_rule">
+            <field name="name">Supplier own purchase orders</field>
+            <field name="model_id" ref="model_purchase_order"/>
+            <field name="global" eval="False"/>
+            <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('purchase_supplier_validation.res_groups_supplier'))]"/>
+        </record>
+
+    </data>
+</openerp>
