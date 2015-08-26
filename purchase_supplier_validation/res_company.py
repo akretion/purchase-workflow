@@ -19,22 +19,8 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ###############################################################################
-from openerp import models, api, fields, _, exceptions
+from openerp import models, fields
 
-
-class PurchaseOrder(models.Model):
-    _inherit = "purchase.order"
-
-    @api.multi
-    def purchase_supplier_confirm(self):
-        print "******"
-        action_user_id = self.company_id.purchase_action_user_id.id
-        if not action_user_id:
-            raise exceptions.Warning(
-                _('No purchase user is configured on the company '
-                  'you should contact the administrador'))
-        self.sudo(action_user_id).signal_workflow('purchase_approve')
-        return True
 
 class ResCompany(models.Model):
     _inherit = "res.company"

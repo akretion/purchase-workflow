@@ -9,7 +9,8 @@
                 <search string="Search Purchase Order">
                     <field name="name" string="Reference"/>
                     <field name="product_id"/>
-                    <filter name="approved" string="Purchase Orders" domain="[('state','not in',('draft','cancel'))]"/>
+                    <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                    <filter name="confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
                     <filter name="exception" string="Exception" domain="[('state','in',('except_invoice','except_picking'))]"/>
                     <separator/>
                     <filter name="not_invoiced" string="Not Invoiced" domain="[('invoice_ids','=', False)]"/>
@@ -27,7 +28,7 @@
             <field name="name">purchase.order.tree</field>
             <field name="model">purchase.order</field>
             <field name="arch" type="xml">
-                <tree fonts="bold:message_unread==True" colors="grey:state=='cancel';blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')" string="Purchase Order">
+                <tree fonts="bold:message_unread==True" colors="blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')" string="Purchase Order">
                     <field name="message_unread" invisible="1"/>
                     <field name="name" string="Reference"/>
                     <field name="date_order" />
@@ -47,7 +48,7 @@
             <field name="arch" type="xml">
                 <form string="Purchase Order">
                 <header>
-                    <button name="purchase_approve" states="confirmed" string="Approve Order" class="oe_highlight" groups="purchase.group_purchase_manager,purchase_supplier_validation.res_groups_supplier"/>
+                    <button name="purchase_supplier_confirm" type="object" states="confirmed" string="Approve Order" class="oe_highlight" groups="purchase_supplier_validation.res_groups_supplier"/>
                     <field name="state" widget="statusbar" statusbar_visible="confirmed,approved,done" statusbar_colors='{"except_picking":"red","except_invoice":"red","confirmed":"blue"}' readonly="1"/>
                 </header>
                 <sheet>
@@ -61,7 +62,6 @@
                         <group>
                             <field name="partner_id" readonly="1"/>
                             <field name="partner_ref" readonly="1"/>
-                            <field name="pricelist_id" groups="product.group_purchase_pricelist" />
                             <field name="journal_id" invisible='1'/>
                         </group>
                         <group>
@@ -71,8 +71,8 @@
                     </group>
                     <notebook>
                         <page string="Products">
-                            <field name="order_line" readonly="1">
-                                <tree string="Purchase Order Lines">
+                            <field name="order_line">
+                                <tree string="Purchase Order Lines" editable="bottom">
                                     <field name="product_id"/>
                                     <field name="name"/>
                                     <field name="date_planned"/>
@@ -106,13 +106,13 @@
         </record>
 
         <record id="supplier_purchase_order_action" model="ir.actions.act_window">
-            <field name="name">Purchase Order</field>
+            <field name="name">Purchase Order Supplier</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">purchase.order</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('state','not in',['draft', 'sent', 'bid', 'cancel']), ('partner_id', 'child_of', user.partner_id.id)]</field>
-            <field name="search_view_id" ref="view_supplier_purchase_order_search"/>
+            <field name="domain">[('state','not in',['draft', 'sent', 'bid', 'cancel'])]</field>
+            <field name="search_view_id" ref="view_supplier_purchase_order_filter"/>
             <field name="auto_refresh">1</field>
         </record>
 

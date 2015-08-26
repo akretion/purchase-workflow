@@ -19,18 +19,24 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ###############################################################################
-{
-    'name': 'Purchase supplier validation',
-    'summary': 'Allow external supplier to validate his purchase orders.'
-    'version': '1.0',
-    'category': '',
-    'license': 'AGPL-3',
-    'author': 'Akretion',
-    'website': 'http://www.akretion.com/',
-    'depends': ['purchase'],
-    'data': [
-        'purchase_view.xml',
-        'security/supplier_security.xml',
-        ],
-    'installable': True,
-}
+{"name": "Purchase supplier validation",
+ "version": "1.0",
+ "summary": "Allow external supplier to validate his purchase orders.",
+ "author": "Akretion",
+ "license": "AGPL-3",
+ "category": "Purchase Management",
+ "complexity": "normal",
+ "images": [],
+ "depends": ["purchase_double_validation",
+             ],
+ "demo": [],
+ "data": ["security/supplier_security.xml",
+          "security/ir.model.access.csv",
+          "purchase_view.xml",
+          "company_view.xml",
+          ],
+ "auto_install": False,
+ "test": [],
+ "installable": True,
+ "certificate": "",
+ }
