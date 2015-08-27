@@ -34,6 +34,7 @@
           "security/ir.model.access.csv",
           "purchase_view.xml",
           "company_view.xml",
+          "purchase_workflow.xml",
           ],
  "auto_install": False,
  "test": [],

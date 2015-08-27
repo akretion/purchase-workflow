@@ -48,7 +48,7 @@
             <field name="arch" type="xml">
                 <form string="Purchase Order">
                 <header>
-                    <button name="purchase_supplier_confirm" type="object" states="confirmed" string="Approve Order" class="oe_highlight" groups="purchase_supplier_validation.res_groups_supplier"/>
+                    <button name="purchase_supplier_confirm" type="object" states="confirmed" string="Approve Order" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="confirmed,approved,done" statusbar_colors='{"except_picking":"red","except_invoice":"red","confirmed":"blue"}' readonly="1"/>
                 </header>
                 <sheet>

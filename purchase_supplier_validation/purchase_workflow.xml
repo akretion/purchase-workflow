@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="trans_approved_cancel" model="workflow.transition">
+            <field name="act_from" ref="purchase_double_validation.act_double_check"/>
+            <field name="act_to" ref="purchase.act_cancel"/>
+            <field name="signal">purchase_cancel</field>
+        </record>
+
+    </data>
+</openerp>

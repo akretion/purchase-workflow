@@ -25,4 +25,6 @@ from openerp import models, fields
 class ResCompany(models.Model):
     _inherit = "res.company"
 
-    purchase_action_user_id = fields.Many2one('res.users', string='Action user')
+    purchase_action_user_id = fields.Many2one(
+        'res.users',
+        string='Action user')

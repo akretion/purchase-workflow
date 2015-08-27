@@ -19,7 +19,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ###############################################################################
-from openerp import models, api, fields, _, exceptions
+from openerp import models, api, _, exceptions
 
 
 class PurchaseOrder(models.Model):
@@ -27,7 +27,6 @@ class PurchaseOrder(models.Model):
 
     @api.multi
     def purchase_supplier_confirm(self):
-        print "******"
         action_user_id = self.company_id.purchase_action_user_id.id
         if not action_user_id:
             raise exceptions.Warning(
@@ -35,8 +34,3 @@ class PurchaseOrder(models.Model):
                   'you should contact the administrador'))
         self.sudo(action_user_id).signal_workflow('purchase_approve')
         return True
-
-class ResCompany(models.Model):
-    _inherit = "res.company"
-
-    purchase_action_user_id = fields.Many2one('res.users', string='Action user')
