@@ -28,7 +28,12 @@
             <field name="name">purchase.order.tree</field>
             <field name="model">purchase.order</field>
             <field name="arch" type="xml">
-                <tree fonts="bold:message_unread==True" colors="blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')" string="Purchase Order">
+                <tree
+                    fonts="bold:message_unread==True"
+                    colors="blue:state in ('wait','confirmed');red:state in ('except_invoice','except_picking')"
+                    string="Purchase Order"
+                    create="0" edit="0"
+                    >
                     <field name="message_unread" invisible="1"/>
                     <field name="name" string="Reference"/>
                     <field name="date_order" />
@@ -46,7 +51,7 @@
             <field name="name">purchase.order.form</field>
             <field name="model">purchase.order</field>
             <field name="arch" type="xml">
-                <form string="Purchase Order">
+                <form string="Purchase Order" create="0" edit="0">
                 <header>
                     <button name="purchase_supplier_confirm" type="object" states="confirmed" string="Approve Order" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="confirmed,approved,done" statusbar_colors='{"except_picking":"red","except_invoice":"red","confirmed":"blue"}' readonly="1"/>
