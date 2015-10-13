@@ -28,6 +28,7 @@
  "complexity": "normal",
  "images": [],
  "depends": ["purchase_double_validation",
+             "web_m2x_options",
              ],
  "demo": [],
  "data": ["security/supplier_security.xml",
