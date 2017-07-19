@@ -18,11 +18,18 @@ class PurchaseOrder(models.Model):
             for line in order.order_line:
                 amount_untaxed += line.price_subtotal
                 # FORWARDPORT UP TO 10.0
-                if order.company_id.tax_calculation_rounding_method == 'round_globally':
+                if (
+                    order.company_id.tax_calculation_rounding_method ==
+                    'round_globally'
+                ):
                     # purchase_discount modif below: price_unit uses discount
                     price_unit = line.price_unit * (1 - line.discount / 100.0)
-                    taxes = line.taxes_id.compute_all(price_unit, line.order_id.currency_id, line.product_qty, product=line.product_id, partner=line.order_id.partner_id)
-                    amount_tax += sum(t.get('amount', 0.0) for t in taxes.get('taxes', []))
+                    taxes = line.taxes_id.compute_all(
+                        price_unit, line.order_id.currency_id,
+                        line.product_qty, product=line.product_id,
+                        partner=line.order_id.partner_id)
+                    amount_tax += sum(
+                        t.get('amount', 0.0) for t in taxes.get('taxes', []))
                 else:
                     amount_tax += line.price_tax
             order.update({
