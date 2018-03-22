@@ -56,8 +56,19 @@ class ProductProduct(models.Model):
     def _complete_purchase_line_vals(self, line, vals):
         vals = line.play_onchanges(vals, ['product_id'])
         if vals.get('taxes_id'):
-            vals['taxes_id'] = [(6, 0, vals['taxes_id'])]
+            vals['taxes_id'] = [
+                (6, 0, self._hack_tax4siliba(vals['taxes_id']))]
         return vals
+
+    def _hack_tax4siliba(self, taxes_id):
+        taxes = []
+        for tup in taxes_id:
+            if isinstance(tup, tuple):
+                for id in tup:
+                    taxes.append(id)
+            elif isinstance(tup, int):
+                taxes.append(tup)
+        return self.env['account.tax'].search([('id', 'in', taxes)])._ids
 
     def _inverse_set_purchase_qty(self):
         purchase = self.env['purchase.order'].browse(
