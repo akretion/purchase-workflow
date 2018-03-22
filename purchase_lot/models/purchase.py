@@ -3,7 +3,7 @@
 # © 2014 Florian Da Costa @ Akretion
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from openerp import api, fields, models
+from odoo import api, fields, models
 
 
 class PurchaseOrderLine(models.Model):
@@ -35,12 +35,22 @@ class ProcurementOrder(models.Model):
             res['lot_id'] = self.lot_id.id
         return res
 
-    # Need to merge https://github.com/akretion/odoo/tree/9.0-hooks
     @api.model
     def check_merge_po_line(self, line, procurement):
+        "TODO MIGR"
         res = super(ProcurementOrder, self).check_merge_po_line(
             line, procurement)
         if not line.lot_id == procurement.lot_id:
             return False
         else:
             return res
+
+
+class QuantPackage(models.Model):
+    """ Tips comes from
+        https://github.com/odoo/odoo/issues/14493#issuecomment-280715903
+        Merged in v11 :
+        https://github.com/odoo/odoo/blob/11.0/addons/stock/models/stock_quant.py#L320-L321
+    """
+    _inherit = 'stock.quant.package'
+    _parent_store = False
