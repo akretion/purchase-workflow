@@ -36,3 +36,5 @@ class PurchaseOrder(models.Model):
             min_date = dates and dates[0] or False
             if min_date:
                 order.date_order = min_date
+            else:
+                order.date_order = order.create_date
