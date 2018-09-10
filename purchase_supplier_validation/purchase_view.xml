@@ -27,6 +27,7 @@
         <record id="supplier_purchase_order_tree" model="ir.ui.view">
             <field name="name">purchase.order.tree</field>
             <field name="model">purchase.order</field>
+            <field eval="100" name="priority"/>
             <field name="arch" type="xml">
                 <tree
                     fonts="bold:message_unread==True"
@@ -50,6 +51,7 @@
         <record id="supplier_purchase_order_form" model="ir.ui.view">
             <field name="name">purchase.order.form</field>
             <field name="model">purchase.order</field>
+            <field eval="100" name="priority"/>
             <field name="arch" type="xml">
                 <form string="Purchase Order" create="0" edit="0">
                 <header>
