@@ -20,7 +20,7 @@ class PurchaseRequestLine(models.Model):
         for request_line in self:
             dates = []
             if not request_line.purchase_lines:
-                dates.append(self._calc_default_date_required())
+                dates.append(request_line._calc_default_date_required())
             for line in request_line.purchase_lines:
                 dates.append(line.date_order)
             dates.sort()
