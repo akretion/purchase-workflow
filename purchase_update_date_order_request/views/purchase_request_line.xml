@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<odoo>
+    <record model="ir.ui.view" id="view_purchase_request_form">
+        <field name="name">purchase.request.form</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id"
+               ref="purchase_request.view_purchase_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']/tree"
+                   position="inside">
+                   <field name="least_date_order" />
+            </xpath>
+            <!-- <xpath expr="//field[@name='line_ids']/form//notebook"
+                   position="inside">
+                <page name="purchase_lines"
+                      string="Purchase Order Lines">
+                    <group>
+                        <field name="purchased_qty"/>
+                        <field name="purchase_state"/>
+                    </group>
+                    <newline/>
+                    <group>
+                        <field name="purchase_lines" nolabel="1"/>
+                    </group>
+                </page>
+            </xpath> -->
+        </field>
+    </record>
+
+        <record id="purchase_request_line_tree" model="ir.ui.view">
+            <field name="name">purchase.request.line.tree</field>
+            <field name="model">purchase.request.line</field>
+            <field name="inherit_id"
+                   ref="purchase_request.purchase_request_line_tree"/>
+            <field name="arch" type="xml">
+                <field name="date_required" position="after">
+                    <field name="least_date_order" widget="date"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="purchase_request_line_form" model="ir.ui.view">
+            <field name="name">purchase.request.line.form</field>
+            <field name="model">purchase.request.line</field>
+            <field name="inherit_id"
+                   ref="purchase_request.purchase_request_line_form"/>
+            <field name="arch" type="xml">
+                <field name="date_required" position="after">
+                    <field name="least_date_order" widget="date" />
+                </field>
+            </field>
+        </record>
+
+
+        <record id="purchase_order_line_tree_sub" model="ir.ui.view">
+            <field name="name">purchase.order.line.tree</field>
+            <field name="model">purchase.order.line</field>
+            <field name="inherit_id" ref="purchase_request_to_rfq.purchase_order_line_tree_sub" />
+            <field name="arch" type="xml">
+                <field name="date_planned" position="after">
+                    <field name="date_order" widget="date"/>
+                </field>
+            </field>
+        </record>        
+
+</odoo>
