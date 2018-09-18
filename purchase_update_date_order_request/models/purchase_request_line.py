@@ -14,7 +14,7 @@ class PurchaseRequestLine(models.Model):
         compute='_compute_least_date_order',
         store=True)
 
-    @api.depends('purchase_lines.date_order')
+    @api.depends('purchase_lines', 'purchase_lines.order_id.date_order')
     def _compute_least_date_order(self):
         """Calc when to order with current RFQs."""
         for request_line in self:
