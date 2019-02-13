@@ -18,6 +18,9 @@ class PurchaseRequestLine(models.Model):
     def _compute_least_date_order(self):
         """Calc when to order with current RFQs."""
         for request_line in self:
+            if not request_line.product_id:
+                request_line.least_date_order = None
+                continue
             dates = []
             if not request_line.purchase_lines:
                 dates.append(request_line._calc_default_date_required())
