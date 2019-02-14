@@ -5,7 +5,7 @@
 
 {
     'name': 'Quick Purchase order',
-    'version': '10.0.1.0.0',
+    'version': '12.0.1.0.0',
     'author': 'Akretion, Odoo Community Association (OCA)',
     'website': 'http://www.akretion.com',
     'license': 'AGPL-3',
@@ -13,6 +13,7 @@
     'depends': [
         'purchase',
         'onchange_helper',
+        'stock',
     ],
     'data': [
         'views/purchase_view.xml',
