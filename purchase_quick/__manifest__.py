@@ -12,7 +12,6 @@
     'category': 'Purchase',
     'depends': [
         'purchase',
-        'onchange_helper',
         'stock',
     ],
     'data': [

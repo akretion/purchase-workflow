@@ -5,6 +5,7 @@
 
 
 from odoo import api, fields, models, _
+from odoo.tests.common import Form
 
 
 class ProductProduct(models.Model):
@@ -37,8 +38,8 @@ class ProductProduct(models.Model):
 
     def _add_purchase_line(self, purchase):
         vals = self._prepare_purchase_line(purchase)
-        line = self.env['purchase.order.line'].new(vals)
-        vals = self._complete_purchase_line_vals(line, vals)
+        # line = self.env['purchase.order.line'].new(vals)
+        vals = self._complete_purchase_line_vals(False, vals)
         if not vals.get('price_unit'):
             vals['price_unit'] = 0.0
         self.env['purchase.order.line'].create(vals)
@@ -53,10 +54,25 @@ class ProductProduct(models.Model):
             purchase_line.unlink()
 
     def _complete_purchase_line_vals(self, line, vals):
-        vals = line.play_onchanges(vals, ['product_id'])
-        if vals.get('taxes_id'):
-            vals['taxes_id'] = [(6, 0, vals['taxes_id'])]
-        return vals
+        form_line = None
+        line_view = 'purchase.purchase_order_line_form2'
+        if line:
+            form_line = Form(line, view=line_view)
+        else:
+            form_line = Form(self.env['purchase.order.line'], view=line_view)
+        init_keys = ['product_id', 'order_id']
+        init_vals = [(key, val) for key, val in vals.items()
+                     if key in init_keys]
+        form_line._values.update(init_vals)
+        form_line._perform_onchange(init_keys)
+        update_keys = [key for key in vals.keys() if key not in init_keys]
+        update_vals = [(key, val) for key, val in vals.items()
+                       if key not in init_keys]
+        form_line._values.update(update_vals)
+        form_line._perform_onchange(update_keys)
+        if form_line.taxes_id:
+            form_line.taxes_id = [(6, 0, form_line.taxes_id)]
+        return form_line._values
 
     def _inverse_set_purchase_qty(self):
         purchase = self.env['purchase.order'].browse(

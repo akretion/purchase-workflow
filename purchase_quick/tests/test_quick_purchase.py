@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo.tests.common import TransactionCase
+from odoo.tests.common import Form
 
 
 class TestQuickPurchase(TransactionCase):
@@ -24,8 +25,8 @@ class TestQuickPurchase(TransactionCase):
             'partner_id': self.partner_id.id,
         }
         self.po = self.PurchaseOrder.create(po_vals)
-        self.po.play_onchanges(
-            {'partner_id': self.partner_id.id}, ['partner_id'])
+        with Form(self.po, 'purchase.purchase_order_form') as po_form:
+            po_form.partner_id = self.partner_id
         # test add purchase order line
         self.product_id_1.with_context(
             {'purchase_id': self.po.id}).qty_to_purchase = 5.0
