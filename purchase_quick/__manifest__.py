@@ -11,8 +11,8 @@
     'license': 'AGPL-3',
     'category': 'Purchase',
     'depends': [
+        'base_product_mass_addition',
         'purchase',
-        'stock',
     ],
     'data': [
         'views/purchase_view.xml',

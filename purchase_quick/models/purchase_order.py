@@ -15,7 +15,9 @@ class PurchaseOrder(models.Model):
         self.ensure_one()
         action = self.env.ref('purchase.product_product_action')
         context = ast.literal_eval(action.context or "{}").copy()
-        context.update({'purchase_id': self.id})
+        context.update({
+            'parent_id': self.id,
+            'parent_model': 'purchase.order'})
         result = action.read()[0]
         name = action.name + " (%s)" % self.partner_id.name
         result.update(

@@ -1,0 +1,1 @@
+product-attribute https://github.com/akretion/product-attribute 12-product_base_mass_add

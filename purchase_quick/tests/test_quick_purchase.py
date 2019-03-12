@@ -28,13 +28,15 @@ class TestQuickPurchase(TransactionCase):
         with Form(self.po, 'purchase.purchase_order_form') as po_form:
             po_form.partner_id = self.partner_id
         # test add purchase order line
-        self.product_id_1.with_context(
-            {'purchase_id': self.po.id}).qty_to_purchase = 5.0
+        self.product_id_1.with_context({
+            'parent_id': self.po.id,
+            'parent_model': 'purchase.order'}).qty_to_process = 5.0
         self.assertEqual(
             len(self.po.order_line), 1,
             'Purchase: no purchase order line created')
-        self.product_id_2.with_context(
-            {'purchase_id': self.po.id}).qty_to_purchase = 6.0
+        self.product_id_2.with_context({
+            'parent_id': self.po.id,
+            'parent_model': 'purchase.order'}).qty_to_process = 6.0
         self.assertEqual(
             len(self.po.order_line), 2, 'Purchase order line count must be 2')
         # test purchase line qty
@@ -47,10 +49,12 @@ class TestQuickPurchase(TransactionCase):
                     line.product_qty, 6)
 
         # test update purchase order line qty
-        self.product_id_1.with_context(
-            {'purchase_id': self.po.id}).qty_to_purchase = 3.0
-        self.product_id_2.with_context(
-            {'purchase_id': self.po.id}).qty_to_purchase = 2.0
+        self.product_id_1.with_context({
+            'parent_id': self.po.id,
+            'parent_model': 'purchase.order'}).qty_to_process = 3.0
+        self.product_id_2.with_context({
+            'parent_id': self.po.id,
+            'parent_model': 'purchase.order'}).qty_to_process = 2.0
         self.assertEqual(
             len(self.po.order_line), 2, 'Purchase order line count must be 2')
         # test purchase line qty after update
@@ -81,6 +85,6 @@ class TestQuickPurchase(TransactionCase):
             product_act_from_po['search_view_id'][0],
             product_act_origin.search_view_id.id)
         self.assertEqual(
-            product_act_from_po['context']['purchase_id'], self.po.id)
+            product_act_from_po['context']['parent_id'], self.po.id)
         self.assertEqual(
             product_act_from_po['domain'], product_act_origin.domain)
