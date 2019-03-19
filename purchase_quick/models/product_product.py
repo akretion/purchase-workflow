@@ -16,12 +16,6 @@ class ProductProduct(models.Model):
         help='Technical: used to compute quantities to purchase.',
     )
 
-    def _prepare_quick_line(self, parent):
-        res = super(ProductProduct, self)._prepare_quick_line(parent)
-        if self.env.context['parent_model'] == 'purchase.order':
-            res['order_id'] = parent.id
-        return res
-
     def _get_quick_line(self, parent):
         if self.env.context['parent_model'] == 'purchase.order':
             return self.env['purchase.order.line'].search([
@@ -33,13 +27,13 @@ class ProductProduct(models.Model):
         if self.env.context['parent_model'] == 'purchase.order':
             return {'product_qty': self.qty_to_process}
 
-    def _complete_quick_line_vals(self, line, vals, view=False, parent_key=''):
+    def _complete_quick_line_vals(self, parent, vals,
+                                  parent_key='', lines_key=''):
         if self.env.context['parent_model'] == 'purchase.order':
-            view = {'ref': 'purchase.purchase_order_line_form2',
-                    'model': 'purchase.order.line'}
+            lines_key = 'order_line'
             parent_key = 'order_id'
         return super(ProductProduct, self)._complete_quick_line_vals(
-            line, vals, view=view, parent_key=parent_key)
+            parent, vals, parent_key=parent_key, lines_key=lines_key)
 
     @api.depends('po_line_ids')
     def _compute_process_qty(self):
