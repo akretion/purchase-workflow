@@ -4,8 +4,7 @@
 # @author Pierrick Brun <pierrick.brun@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import ast
-from odoo import api, models
+from odoo import api, models, _
 
 
 class PurchaseOrder(models.Model):
@@ -15,17 +14,24 @@ class PurchaseOrder(models.Model):
     @api.multi
     def add_product(self):
         self.ensure_one()
-        action = self.env.ref('purchase.product_product_action')
-        context = ast.literal_eval(action.context or "{}").copy()
-        context.update({
+        context = {
+            'search_default_filter_to_purchase': 1,
+            'search_default_filter_for_current_supplier': 1,
             'parent_id': self.id,
-            'parent_model': 'purchase.order'})
-        result = action.read()[0]
-        name = action.name + " (%s)" % self.partner_id.name
-        result.update(
-            {'target': 'current', 'context': context,
-             'view_mode': 'tree', 'name': name})
-        return result
+            'parent_model': 'purchase.order',
+        }
+        commercial = self.partner_id.commercial_partner_id.name
+        name = "🔙 %s (%s)" % (_('Product Variants'), commercial)
+        return {
+            'name': name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'product.product',
+            'target': 'current',
+            'context': context,
+            'view_mode': 'tree',
+            'view_id': self.env.ref(
+                'base_product_mass_addition.product_product_tree_view').id,
+        }
 
     def _get_quick_line(self, product):
         return self.env['purchase.order.line'].search([

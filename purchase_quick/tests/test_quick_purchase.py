@@ -75,16 +75,9 @@ class TestQuickPurchase(TransactionCase):
         self.assertEqual(
             product_act_from_po['res_model'], product_act_origin.res_model)
         self.assertEqual(
-            product_act_from_po['view_type'], product_act_origin.view_type)
-        self.assertEqual(
             product_act_from_po['view_mode'], product_act_origin.view_mode)
         self.assertEqual(product_act_from_po['target'], 'current')
         self.assertEqual(
-            product_act_from_po['view_id'][0], product_act_origin.view_id.id)
-        self.assertEqual(
-            product_act_from_po['search_view_id'][0],
-            product_act_origin.search_view_id.id)
+            product_act_from_po['view_id'], product_act_origin.view_id.id)
         self.assertEqual(
             product_act_from_po['context']['parent_id'], self.po.id)
-        self.assertEqual(
-            product_act_from_po['domain'], product_act_origin.domain)
