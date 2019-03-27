@@ -14,24 +14,16 @@ class PurchaseOrder(models.Model):
     @api.multi
     def add_product(self):
         self.ensure_one()
-        context = {
+        res = self._common_action_keys()
+        res['context'].update({
             'search_default_filter_to_purchase': 1,
             'search_default_filter_for_current_supplier': 1,
-            'parent_id': self.id,
-            'parent_model': 'purchase.order',
-        }
+        })
         commercial = self.partner_id.commercial_partner_id.name
-        name = "🔙 %s (%s)" % (_('Product Variants'), commercial)
-        return {
-            'name': name,
-            'type': 'ir.actions.act_window',
-            'res_model': 'product.product',
-            'target': 'current',
-            'context': context,
-            'view_mode': 'tree',
-            'view_id': self.env.ref(
-                'base_product_mass_addition.product_product_tree_view').id,
-        }
+        res['name'] = "🔙 %s (%s)" % (_('Product Variants'), commercial)
+        res['view_id'] = self.env.ref(
+            'purchase_quick.product_tree_view4purchase').id,
+        return res
 
     def _get_quick_line(self, product):
         return self.env['purchase.order.line'].search([

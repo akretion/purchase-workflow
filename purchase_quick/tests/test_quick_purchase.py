@@ -67,17 +67,16 @@ class TestQuickPurchase(TransactionCase):
                     line.product_qty, 2)
 
         # test that add_product open the right action
-        product_act_origin = self.env.ref(
-            'purchase.product_product_action')
         product_act_from_po = self.po.add_product()
         self.assertEqual(
             product_act_from_po['type'], 'ir.actions.act_window')
         self.assertEqual(
-            product_act_from_po['res_model'], product_act_origin.res_model)
+            product_act_from_po['res_model'], 'product.product')
         self.assertEqual(
-            product_act_from_po['view_mode'], product_act_origin.view_mode)
+            product_act_from_po['view_mode'], 'tree')
         self.assertEqual(product_act_from_po['target'], 'current')
         self.assertEqual(
-            product_act_from_po['view_id'], product_act_origin.view_id.id)
+            product_act_from_po['view_id'][0], self.env.ref(
+                'purchase_quick.product_tree_view4purchase').id)
         self.assertEqual(
             product_act_from_po['context']['parent_id'], self.po.id)
