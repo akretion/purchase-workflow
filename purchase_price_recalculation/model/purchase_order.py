@@ -11,8 +11,8 @@ class PurchaseOrder(models.Model):
         price_origin = {rec: (rec.amount_untaxed, rec.amount_tax)
                         for rec in self}
         for line in self.mapped('order_line'):
-            dict = line._convert_to_write(line.read()[0])
-            line2 = self.env['purchase.order.line'].new(dict)
+            vals = line._convert_to_write(line.read()[0])
+            line2 = self.env['purchase.order.line'].new(vals)
             # we make this to isolate changed values:
             line2.onchange_product_id()
             line.write({
