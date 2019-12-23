@@ -6,13 +6,20 @@
         <field name="inherit_id" ref="purchase.purchase_order_form" />
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
+                <field name="is_picking_done" invisible="1"/>
                 <button class="oe_stat_button"
                         name="action_open_landed_cost"
                         icon="fa-credit-card"
                         type="object"
-                        string="Landed costs">
+                        string="Landed costs"
+                        attrs="{'invisible': ['|', ('is_picking_done', '!=', 'done'), ('cost_distribution_ok', '=', 'False')]}">
                 </button>
             </div>
+
+            <xpath expr="//field[@name='company_id']/.." position="inside">
+                <field name="cost_distribution_ok"/>
+            </xpath>
+
         </field>
     </record>
 
