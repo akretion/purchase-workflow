@@ -12,7 +12,7 @@
                         icon="fa-credit-card"
                         type="object"
                         string="Landed costs"
-                        attrs="{'invisible': ['|', ('is_picking_done', '!=', 'done'), ('cost_distribution_ok', '=', 'False')]}">
+                        attrs="{'invisible': ['|', ('is_picking_done', '!=', True), ('cost_distribution_ok', '=', 'False')]}">
                 </button>
             </div>
 
