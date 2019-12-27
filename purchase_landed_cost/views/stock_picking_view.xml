@@ -7,13 +7,14 @@
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
                 <field name="cost_distribution_state" invisible="1"/>
+                <!-- TODO change invisible condition to ('state', '!=', 'done') if Cost distribution only on pickings done -->
                 <button
                     class="oe_stat_button"
                     name="action_open_landed_cost"
                     icon="fa-credit-card"
                     type="object"
                     string="Landed costs"
-                    attrs="{'invisible': ['|', '|', ('state', '!=', 'done'), ('cost_distribution_ok', '=', False), ('cost_distribution_state', 'not in', ['draft', 'calculated', 'done'])]}">
+                    attrs="{'invisible': ['|', '|', ('state', 'not in', ['assigned', 'done']), ('cost_distribution_ok', '=', False), ('cost_distribution_state', 'not in', ['draft', 'calculated', 'done'])]}">
                 </button>
             </div>
             <xpath expr="//button[@name='action_toggle_is_locked']" position="after">

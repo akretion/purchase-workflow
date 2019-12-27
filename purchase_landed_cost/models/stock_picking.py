@@ -56,5 +56,6 @@ class StockPicking(models.Model):
                         break
                 picking.cost_distribution_state = lower_state
             else:
-                if picking.state == 'done':
+                # TODO change to "picking.state == 'done'" if Cost distribution only on pickings done
+                if picking.state in ['assigned', 'done']:
                     picking.cost_distribution_state = 'required'
