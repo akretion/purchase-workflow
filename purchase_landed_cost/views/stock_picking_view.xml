@@ -6,18 +6,43 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
-                <button class="oe_stat_button"
-                  name="action_open_landed_cost"
-                  icon="fa-credit-card"
-                  type="object"
-                  string="Landed costs"
-                  attrs="{'invisible': ['|', ('state', '!=', 'done'), ('cost_distribution_ok', '=', 'False')]}">
+                <field name="cost_distribution_state" invisible="1"/>
+                <button
+                    class="oe_stat_button"
+                    name="action_open_landed_cost"
+                    icon="fa-credit-card"
+                    type="object"
+                    string="Landed costs"
+                    attrs="{'invisible': ['|', '|', ('state', '!=', 'done'), ('cost_distribution_ok', '=', False), ('cost_distribution_state', 'not in', ['draft', 'calculated', 'done'])]}">
                 </button>
             </div>
+            <xpath expr="//button[@name='action_toggle_is_locked']" position="after">
+                <button
+                    class="oe_highlight"
+                    name="action_open_landed_cost"
+                    type="object"
+                    string="Register Landed Costs"
+                    attrs="{'invisible': ['|', ('cost_distribution_state', '!=', 'required'), ('cost_distribution_ok', '=', False)]}">
+                </button>
+            </xpath>
             <xpath expr="//field[@name='origin']/.." position="inside">
                 <field name="cost_distribution_ok"/>
+                <field name="cost_distribution_state"/>
             </xpath>
+        </field>
+    </record>
 
+    <record model="ir.ui.view" id="view_picking_internal_search">
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+          <xpath expr="//filter[@name='backorder']" position="after">
+            <separator/>
+            <filter name="distribution_required" string="Required Costs Dist." domain="[('cost_distribution_state','=', 'required')]"/>
+            <filter name="distribution_draft" string="Draft Costs Dist." domain="[('cost_distribution_state','=', 'draft')]"/>
+            <filter name="distribution_calculated" string="Calculated Costs Dist." domain="[('cost_distribution_state','=', 'calculated')]"/>
+            <filter name="distribution_done" string="Done Costs Dist." domain="[('cost_distribution_state','=', 'done')]"/>
+          </xpath>
         </field>
     </record>
 

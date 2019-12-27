@@ -8,7 +8,10 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     cost_distribution_ok = fields.Boolean(
-        related='purchase_id.cost_distribution_ok', readonly='False')
+        related='purchase_id.cost_distribution_ok', readonly=True, default=False)
+
+    cost_distribution_state = fields.Char(
+        compute='_compute_cost_distribution_state', default='', string='Cost Distribution State', store=True)
 
     @api.multi
     def action_open_landed_cost(self):
@@ -33,3 +36,25 @@ class StockPicking(models.Model):
             action = lines.get_action_purchase_cost_distribution()
 
         return action
+
+    @api.multi
+    @api.depends('state')
+    def _compute_cost_distribution_state(self):
+        line_obj = self.env['purchase.cost.distribution.line']
+        available_states = ['draft', 'calculated', 'done']
+
+        for picking in self:
+            lines = line_obj.search([('picking_id', '=', picking.id)])
+            if lines:
+                distributions_states = [
+                    line.distribution.state for line in lines]
+                lower_state = ''
+
+                for state in available_states:
+                    if state in distributions_states:
+                        lower_state = state
+                        break
+                picking.cost_distribution_state = lower_state
+            else:
+                if picking.state == 'done':
+                    picking.cost_distribution_state = 'required'

@@ -132,6 +132,12 @@ class PurchaseCostDistribution(models.Model):
                     _("You can't delete a confirmed cost distribution"))
         return super(PurchaseCostDistribution, self).unlink()
 
+    @api.multi
+    def _propagate_state_in_order_picking(self):
+        for line in self.cost_lines:
+            line.purchase_id._compute_cost_distribution_state()
+            line.picking_id._compute_cost_distribution_state()
+
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
@@ -152,7 +158,10 @@ class PurchaseCostDistribution(models.Model):
                     raise UserError(
                         _("You can't delete a cost line if it's an "
                           "affected line of any expense line."))
-        return super(PurchaseCostDistribution, self).write(vals)
+        # Inform related POs and pickings that the distribution state changed
+        res = super(PurchaseCostDistribution, self).write(vals)
+        self._propagate_state_in_order_picking()
+        return res
 
     @api.model
     def _prepare_expense_line(self, expense_line, cost_line):
@@ -481,6 +490,15 @@ class PurchaseCostDistributionLine(models.Model):
         else:
             action['domain'] = [('id', 'in', distributions.ids)]
         return action
+
+    @api.model
+    def create(self, vals):
+        """Inform related PO and picking that they are now linked
+        to a Cost Distribution which state is 'draft' """
+        res = super(PurchaseCostDistributionLine, self).create(vals)
+        res.purchase_id._compute_cost_distribution_state()
+        res.picking_id._compute_cost_distribution_state()
+        return res
 
 
 class PurchaseCostDistributionLineExpense(models.Model):
