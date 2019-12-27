@@ -21,7 +21,8 @@ class PurchaseOrder(models.Model):
     def _compute_is_picking_ok(self):
         for order in self:
             for picking in order.mapped('picking_ids'):
-                if picking.state == 'done':
+                # TODO change to "picking.state == 'done'" if Cost distribution only on pickings done
+                if picking.state in ['assigned', 'done']:
                     order.is_picking_ok = True
 
     @api.multi
@@ -40,7 +41,8 @@ class PurchaseOrder(models.Model):
             import_picking_wizard = self.with_context(active_id=distribution.id)\
                 .env['picking.import.wizard'].create({
                     'supplier': self.partner_id.id,
-                    'pickings': [(6, 0, [picking.id for picking in self.mapped('picking_ids') if picking.state == 'done'])],
+                    # TODO change to "picking.state == 'done'" if Cost distribution only on pickings done
+                    'pickings': [(6, 0, [picking.id for picking in self.mapped('picking_ids') if picking.state in ['assigned', 'done']])],
                 })
             import_picking_wizard.action_import_picking()
 
