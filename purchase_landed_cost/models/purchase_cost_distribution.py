@@ -254,12 +254,15 @@ class PurchaseCostDistribution(models.Model):
         moves_total_qty = 0
         moves_total_diff_price = 0
         for move, price_diff in vals_list:
-            moves_total_qty += move.product_qty
+            if move.state == 'done': # FIX don't substract if move is not done
+                moves_total_qty += move.product_qty
             moves_total_diff_price += move.product_qty * price_diff
+
         prev_qty_available = product.qty_available - moves_total_qty
         if prev_qty_available <= 0:
             prev_qty_available = 0
         total_available = prev_qty_available + moves_total_qty
+
         new_std_price = (
             (total_available * product.standard_price +
              moves_total_diff_price) / total_available
@@ -283,7 +286,7 @@ class PurchaseCostDistribution(models.Model):
             d.setdefault(product, [])
             d[product].append(
                 (line.move_id,
-                 line.standard_price_new - line.standard_price_old),
+                 line.standard_price_new - line.product_id.standard_price), # FIX : use product.standard_price instead of purchase price.
             )
         for product, vals_list in d.items():
             self._product_price_update(product, vals_list)
