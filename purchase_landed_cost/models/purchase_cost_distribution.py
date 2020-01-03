@@ -254,7 +254,7 @@ class PurchaseCostDistribution(models.Model):
         moves_total_qty = 0
         moves_total_diff_price = 0
         for move, price_diff in vals_list:
-            if move.state == 'done': # FIX don't substract if move is not done
+            if move.state == 'done': # FIXED don't substract if move is not done
                 moves_total_qty += move.product_qty
             moves_total_diff_price += move.product_qty * price_diff
 
@@ -283,10 +283,12 @@ class PurchaseCostDistribution(models.Model):
             if (product.cost_method != 'average' or
                     line.move_id.location_id.usage != 'supplier'):
                 continue
+
+            print("Je passe ici dans l'action done\n")
             d.setdefault(product, [])
             d[product].append(
                 (line.move_id,
-                 line.standard_price_new - line.product_id.standard_price), # FIX : use product.standard_price instead of purchase price.
+                 line.standard_price_new - line.product_id.standard_price), # FIXED : use product.standard_price instead of purchase price.
             )
         for product, vals_list in d.items():
             self._product_price_update(product, vals_list)
@@ -463,7 +465,7 @@ class PurchaseCostDistributionLine(models.Model):
     cost_ratio = fields.Float(
         string='Unit cost', compute='_compute_cost_ratio')
     standard_price_new = fields.Float(
-        string='New cost', digits=dp.get_precision('Product Price'),
+        string='Acquisition cost', digits=dp.get_precision('Product Price'),
         compute='_compute_standard_price_new')
     total_amount = fields.Float(
         compute=_compute_total_amount, string='Amount line',
