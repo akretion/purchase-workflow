@@ -7,6 +7,7 @@ from odoo import fields, models
 
 class PurchaseExpenseType(models.Model):
     _name = "purchase.expense.type"
+    # TODO : Improve names consistency "expense" instead of "cost"
     _description = "Purchase cost type"
 
     name = fields.Char(string='Name', required=True, translate=True,
