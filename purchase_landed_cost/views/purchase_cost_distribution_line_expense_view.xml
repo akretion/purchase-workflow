@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="action_purchase_cost_distribution_line_expense" model="ir.actions.act_window">
-        <field name="name">Expense distribution lines</field>
+        <field name="name">Expenses distribution lines</field>
         <field name="res_model">purchase.cost.distribution.line.expense</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree</field>

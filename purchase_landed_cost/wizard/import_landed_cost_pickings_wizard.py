@@ -9,10 +9,14 @@ class ImportLandedCostPickingsWizard(models.TransientModel):
     _description = 'Import landed cost pickings'
 
     possible_picking_ids = fields.Many2many(
-        comodel_name="stock.picking", string="Possible pickings")
+        comodel_name="stock.picking",
+        string="Possible pickings",
+        relation="import_landed_cost_pickings_wizard_possible_picking_ids_rel")
     picking_ids = fields.Many2many(
-        comodel_name="stock.picking", string="Pickings",
-        domain="[('id', 'in', possible_picking_ids)]")
+        comodel_name="stock.picking",
+        string="Pickings",
+        domain="[('id', 'in', possible_picking_ids)]",
+        relation="import_landed_cost_pickings_wizard_picking_ids_rel")
 
     @api.model
     def default_get(self, fields_list):
@@ -27,6 +31,7 @@ class ImportLandedCostPickingsWizard(models.TransientModel):
 
     @api.multi
     def button_import(self):
+
         self.ensure_one()
         invoice_id = self.env.context['active_id']
         dist_lines = self.env['purchase.cost.distribution.line'].search(

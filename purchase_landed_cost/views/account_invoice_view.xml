@@ -7,9 +7,23 @@
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page string="Landed costs">
+                  <!-- TODO : Improve this button linking an invoice_line to a Cost Distribution Expense
+                        1. A more explicit name should be "Link Invoice Line to Cost Distribution Expense"
+                        2. On clicking, open a pop-up with the following steps :
+                            a. Choose the Invoice Line to link
+                            b. Choose the Cost Distribution with the Expense to be linked
+                            c. Display the selected Cost Distribution Expenses and allows to :
+                                - create a new expense
+                                - or link the selected invoice line to an existing Expense linked with no Invoice Line already
+                                - or change the actual Invoice Line linked to an Expense
+                            d. When clicking on "Link Invoice Line", display in the Invoice M2M fields "expense_line_ids"
+                            all the invoice's Invoice Lines linked to some Cost Distribution Expenses
+
+                        Button set to invisible until these improvements are not done-->
                     <button name="%(purchase_landed_cost.action_import_landed_cost_pickings_wizard)d"
                             string="Import from pickings"
                             type="action"
+                            invisible="1"
                     />
                     <field name="expense_line_ids"
                            nolabel="1"

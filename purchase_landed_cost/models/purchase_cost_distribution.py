@@ -115,7 +115,11 @@ class PurchaseCostDistribution(models.Model):
     total_expense = fields.Float(
         compute=_compute_total_expense,
         digits=dp.get_precision('Account'), string='Total expenses')
+    # TODO : change string to 'Note for this Cost distribution'
     note = fields.Text(string='Documentation for this order')
+    # TODO : Improve consistency between variable name 'cost_lines' and string name 'Distribution lines'
+    # Issue related to the inconsistency in variable names choosen to call 'purchase.cost.distribution.line' objects :
+    # objects named 'cost_lines' here and 'distribution_line' in "purchase.cost.distribution.line.expense" class
     cost_lines = fields.One2many(
         comodel_name='purchase.cost.distribution.line', ondelete="cascade",
         inverse_name='distribution', string='Distribution lines')
@@ -284,7 +288,6 @@ class PurchaseCostDistribution(models.Model):
                     line.move_id.location_id.usage != 'supplier'):
                 continue
 
-            print("Je passe ici dans l'action done\n")
             d.setdefault(product, [])
             d[product].append(
                 (line.move_id,
@@ -463,7 +466,8 @@ class PurchaseCostDistributionLine(models.Model):
         string='Cost amount', digits=dp.get_precision('Account'),
         compute='_compute_expense_amount')
     cost_ratio = fields.Float(
-        string='Unit cost', compute='_compute_cost_ratio')
+        string='Unit cost',
+        compute='_compute_cost_ratio')
     standard_price_new = fields.Float(
         string='Acquisition cost', digits=dp.get_precision('Product Price'),
         compute='_compute_standard_price_new')
@@ -510,6 +514,8 @@ class PurchaseCostDistributionLineExpense(models.Model):
     _name = "purchase.cost.distribution.line.expense"
     _description = "Purchase cost distribution line expense"
 
+    # TODO : Improve consistency names to call 'purchase.cost.distribution.line' objects
+    # objects named 'distribution_line' here and 'cost_lines' in "purchase.cost.distribution" class
     distribution_line = fields.Many2one(
         comodel_name='purchase.cost.distribution.line',
         string='Cost distribution line', ondelete="cascade",
@@ -551,6 +557,12 @@ class PurchaseCostDistributionExpense(models.Model):
                 'purchase.cost.distribution.line']
             record.imported_lines |= record.distribution.cost_lines
 
+    @api.multi
+    @api.depends('invoice_line')
+    def _get_invoice_id(self):
+        for expense in self:
+            expense.invoice_id = expense.invoice_line.invoice_id
+
     distribution = fields.Many2one(
         comodel_name='purchase.cost.distribution', string='Cost distribution',
         index=True, ondelete="cascade", required=True)
@@ -563,7 +575,8 @@ class PurchaseCostDistributionExpense(models.Model):
         readonly=True)
     imported_lines = fields.Many2many(
         comodel_name='purchase.cost.distribution.line',
-        string='Imported lines', compute='_get_imported_lines')
+        string='Imported lines',
+        compute='_get_imported_lines')
     affected_lines = fields.Many2many(
         comodel_name='purchase.cost.distribution.line', column1="expense_id",
         relation="distribution_expense_aff_rel", column2="line_id",
@@ -579,8 +592,13 @@ class PurchaseCostDistributionExpense(models.Model):
         domain="[('invoice_id.type', '=', 'in_invoice'),"
                "('invoice_id.state', 'in', ('open', 'paid'))]")
     invoice_id = fields.Many2one(
-        comodel_name='account.invoice', string="Invoice")
-    display_name = fields.Char(compute="_compute_display_name", store=True)
+        comodel_name='account.invoice',
+        compute='_get_invoice_id',
+        string="Invoice",
+        store=True)
+    display_name = fields.Char(
+        compute="_compute_display_name",
+        store=True)
     company_id = fields.Many2one(
         comodel_name="res.company", related="distribution.company_id",
         store=True,
@@ -599,24 +617,26 @@ class PurchaseCostDistributionExpense(models.Model):
     @api.onchange('type')
     def onchange_type(self):
         """set expense_amount in the currency of the distribution"""
-        if self.type and self.type.default_amount:
-            currency_from = self.type.company_id.currency_id
-            amount = self.type.default_amount
-            currency_to = self.distribution.currency_id
-            company = self.company_id or self.env.user.company_id
-            cost_date = self.distribution.date or fields.Date.today()
-            self.expense_amount = currency_from._convert(amount, currency_to,
-                                                         company, cost_date)
+        currency_from = self.type.company_id.currency_id
+        amount = self.type.default_amount
+        currency_to = self.distribution.currency_id
+        company = self.company_id or self.env.user.company_id
+        cost_date = self.distribution.date or fields.Date.today()
+        # TODO : Check if this conversion really occurs even if computed fields
+        # ((deleting onchange cache datas) are triggered by this onchange on the same time.
+        self.expense_amount = currency_from._convert(amount, currency_to,
+                                                     company, cost_date)
 
     @api.onchange('invoice_line')
     def onchange_invoice_line(self):
         """set expense_amount in the currency of the distribution"""
-        self.invoice_id = self.invoice_line.invoice_id.id
         currency_from = self.invoice_line.company_id.currency_id
         amount = self.invoice_line.price_subtotal
         currency_to = self.distribution.currency_id
         company = self.company_id or self.env.user.company_id
         cost_date = self.distribution.date or fields.Date.today()
+        # TODO : Check if this conversion really occurs even if computed fields
+        # (deleting onchange cache datas) are triggered by this onchange on the same time.
         self.expense_amount = currency_from._convert(amount, currency_to,
                                                      company, cost_date)
 
