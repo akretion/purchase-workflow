@@ -6,6 +6,8 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <p>Select here the pickings for those you want to add their expenses lines.</p>
+            <!-- TODO : it would be more understandable to say "Only the pickings linked
+            to a Cost Distribution with expenses are allowed to be selected here" -->
             <p>Only the pickings with expenses are allowed to be selected here.</p>
             <field name="possible_picking_ids" invisible="1"/>
             <field name="picking_ids" nolabel="1"/>

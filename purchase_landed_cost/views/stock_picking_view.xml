@@ -28,7 +28,6 @@
             </xpath>
             <xpath expr="//field[@name='origin']/.." position="inside">
                 <field name="cost_distribution_ok"/>
-                <field name="cost_distribution_state"/>
             </xpath>
         </field>
     </record>

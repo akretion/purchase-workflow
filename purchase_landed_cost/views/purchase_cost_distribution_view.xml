@@ -81,6 +81,7 @@
         <field name="arch" type="xml">
             <form string="Purchase cost distribution">
                 <header>
+                  <!-- TODO : Improve names consistency between "Incoming Shipment" and "Pickings" -->
                     <button name="%(action_picking_import_wizard)d"
                             string="Import incoming shipment"
                             states="draft" type="action"
@@ -155,7 +156,7 @@
                             <button name="%(action_import_invoice_line_wizard)d"
                                     string="Import invoice line"
                                     states="draft" type="action"/>
-                            <field name="expense_lines" options="{'reload_on_button': true}">
+                            <field name="expense_lines" options="{'reload_on_button': true}" context="{'show_invoice_number': True}">
                                 <tree string="Cost distribution expenses"
                                       editable="bottom">
                                     <field name="type"/>
@@ -167,7 +168,8 @@
                                     <field name="affected_lines"
                                            widget="many2many_tags"/>
                                     <field name="invoice_line"
-                                           options="{'no_create': true, 'create_edit': false}"/>
+                                           options="{'no_create': true, 'create_edit': false}"
+                                           context="{'show_invoice_number': True}"/>
                                 </tree>
                             </field>
                         </page>
