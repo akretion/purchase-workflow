@@ -9,4 +9,4 @@ class Partner(models.Model):
     _inherit = 'res.partner'
 
     cost_distribution_ok = fields.Boolean('Products linked to Landed Costs', default='True',
-                                          help='Storable products from this vendor will need to be linked to Landed Costs')
+                                          help='By default, storable products from this vendor will need to be linked to Landed Costs')
