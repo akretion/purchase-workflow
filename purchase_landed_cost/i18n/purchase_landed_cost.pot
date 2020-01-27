@@ -14,6 +14,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: purchase_landed_cost
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__standard_price_new
+msgid "Acquisition cost"
+msgstr ""
+
+#. module: purchase_landed_cost
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_lines
 msgid "Affected lines"
 msgstr ""
@@ -31,6 +36,12 @@ msgstr ""
 #. module: purchase_landed_cost
 #: selection:purchase.expense.type,calculation_method:0
 msgid "By amount of the line"
+msgstr ""
+
+#. module: purchase_landed_cost
+#: model:ir.model.fields,help:purchase_landed_cost.field_res_partner__cost_distribution_ok
+#: model:ir.model.fields,help:purchase_landed_cost.field_res_users__cost_distribution_ok
+msgid "By default, storable products from this vendor will need to be linked to Landed Costs"
 msgstr ""
 
 #. module: purchase_landed_cost
@@ -69,6 +80,12 @@ msgid "Calculated Cost"
 msgstr ""
 
 #. module: purchase_landed_cost
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_picking_internal_search
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_purchase_order_filter
+msgid "Calculated Costs Dist."
+msgstr ""
+
+#. module: purchase_landed_cost
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__calculation_method
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_expense_type__calculation_method
 msgid "Calculation method"
@@ -100,6 +117,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__company_id
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_expense_type__company_id
 msgid "Company"
+msgstr ""
+
+#. module: purchase_landed_cost
+#: model:ir.model,name:purchase_landed_cost.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: purchase_landed_cost
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_order__cost_distribution_state
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_stock_picking__cost_distribution_state
+msgid "Cost Distribution State"
 msgstr ""
 
 #. module: purchase_landed_cost
@@ -151,7 +179,7 @@ msgid "Cost documentation"
 msgstr ""
 
 #. module: purchase_landed_cost
-#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:308
+#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:325
 #, python-format
 msgid "Cost update cannot be undone because there has been a later update. Restore correct price and try again."
 msgstr ""
@@ -269,8 +297,20 @@ msgid "Done"
 msgstr ""
 
 #. module: purchase_landed_cost
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_picking_internal_search
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_purchase_order_filter
+msgid "Done Costs Dist."
+msgstr ""
+
+#. module: purchase_landed_cost
 #: selection:purchase.cost.distribution,state:0
 msgid "Draft"
+msgstr ""
+
+#. module: purchase_landed_cost
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_picking_internal_search
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_purchase_order_filter
+msgid "Draft Costs Dist."
 msgstr ""
 
 #. module: purchase_landed_cost
@@ -315,7 +355,9 @@ msgid "Expenses"
 msgstr ""
 
 #. module: purchase_landed_cost
+#: model:ir.actions.act_window,name:purchase_landed_cost.action_purchase_cost_distribution_line_expense
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__expense_lines
+#: model:ir.ui.menu,name:purchase_landed_cost.menu_purchase_cost_distribution_line_expense
 msgid "Expenses distribution lines"
 msgstr ""
 
@@ -420,6 +462,11 @@ msgid "Invoice line"
 msgstr ""
 
 #. module: purchase_landed_cost
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_order__is_picking_ok
+msgid "Is Picking Ok"
+msgstr ""
+
+#. module: purchase_landed_cost
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_account_invoice__expense_line_ids
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_account_invoice_line__expense_line_ids
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.invoice_supplier_form
@@ -475,18 +522,19 @@ msgid "Line weight"
 msgstr ""
 
 #. module: purchase_landed_cost
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_order__cost_distribution_ok
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_stock_picking__cost_distribution_ok
+msgid "Must be linked to Landed Costs"
+msgstr ""
+
+#. module: purchase_landed_cost
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__name
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_expense_type__name
 msgid "Name"
 msgstr ""
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__standard_price_new
-msgid "New cost"
-msgstr ""
-
-#. module: purchase_landed_cost
-#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:200
+#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:213
 #, python-format
 msgid "No valid distribution type."
 msgstr ""
@@ -524,7 +572,7 @@ msgid "Pickings"
 msgstr ""
 
 #. module: purchase_landed_cost
-#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:221
+#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:234
 #, python-format
 msgid "Please enter an amount for all the expenses"
 msgstr ""
@@ -552,6 +600,12 @@ msgstr ""
 #. module: purchase_landed_cost
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_purchase_cost_distribution_line_form
 msgid "Product information"
+msgstr ""
+
+#. module: purchase_landed_cost
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_res_partner__cost_distribution_ok
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_res_users__cost_distribution_ok
+msgid "Products linked to Landed Costs"
 msgstr ""
 
 #. module: purchase_landed_cost
@@ -649,6 +703,18 @@ msgid "Reference"
 msgstr ""
 
 #. module: purchase_landed_cost
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_order_form
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_picking_form
+msgid "Register Landed Costs"
+msgstr ""
+
+#. module: purchase_landed_cost
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_picking_internal_search
+#: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_purchase_order_filter
+msgid "Required Costs Dist."
+msgstr ""
+
+#. module: purchase_landed_cost
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_cost_distribution_search
 msgid "Search purchase costs distributions"
 msgstr ""
@@ -696,7 +762,7 @@ msgid "Technical field used to record the product cost set by the user during a 
 msgstr ""
 
 #. module: purchase_landed_cost
-#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:206
+#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:219
 #, python-format
 msgid "The cost for the line '%s' can't be distributed because the calculation method doesn't provide valid data"
 msgstr ""
@@ -722,7 +788,7 @@ msgid "The volume in m3."
 msgstr ""
 
 #. module: purchase_landed_cost
-#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:225
+#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:238
 #, python-format
 msgid "There is no picking lines in the distribution"
 msgstr ""
@@ -833,13 +899,13 @@ msgid "You can find a vendor by its Name, TIN, Email or Internal Reference."
 msgstr ""
 
 #. module: purchase_landed_cost
-#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:132
+#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:136
 #, python-format
 msgid "You can't delete a confirmed cost distribution"
 msgstr ""
 
 #. module: purchase_landed_cost
-#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:153
+#: code:addons/purchase_landed_cost/models/purchase_cost_distribution.py:163
 #, python-format
 msgid "You can't delete a cost line if it's an affected line of any expense line."
 msgstr ""
