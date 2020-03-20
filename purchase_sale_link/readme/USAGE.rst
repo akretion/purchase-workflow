@@ -1,1 +1,0 @@
-* Once the module is installed, confirm a Sale Order with storable products configured with *Buy* and *Make To Order* routes, or with service products with the option *Purchase Automatically* selected.
