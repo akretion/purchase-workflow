@@ -552,7 +552,7 @@ class PurchaseCostDistributionExpense(models.Model):
         string='Expense amount', digits=dp.get_precision('Account'),
         required=True)
     invoice_line = fields.Many2one(
-        comodel_name='account.invoice.line', string="Supplier invoice line",
+        comodel_name='account.invoice.line', string="Expense invoice line",
         domain="[('invoice_id.type', '=', 'in_invoice'),"
                "('invoice_id.state', 'in', ('open', 'paid'))]")
     invoice_id = fields.Many2one(

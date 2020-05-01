@@ -386,7 +386,7 @@ msgstr "Importar envío entrante"
 
 #. module: purchase_landed_cost
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_cost_distribution_form
-msgid "Import invoice line"
+msgid "Import Expense Invoice line"
 msgstr "Importar línea de factura"
 
 #. module: purchase_landed_cost
@@ -404,7 +404,7 @@ msgstr "Importar costes en destino desde albaranes"
 #. module: purchase_landed_cost
 #: model:ir.actions.act_window,name:purchase_landed_cost.action_import_invoice_line_wizard
 #: model:ir.model,name:purchase_landed_cost.model_import_invoice_line_wizard
-msgid "Import supplier invoice line"
+msgid "Import Expense Invoice line"
 msgstr "Importar línea de factura de proveedor"
 
 #. module: purchase_landed_cost
@@ -687,7 +687,7 @@ msgstr "Asistente para seleccionar envío entrante"
 
 #. module: purchase_landed_cost
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.import_invoice_line_wizard_view
-msgid "Select supplier invoice line wizard"
+msgid "Select Expense invoice line wizard"
 msgstr "Asistente para seleccionar la línea de factura de proveedor"
 
 #. module: purchase_landed_cost
@@ -713,7 +713,7 @@ msgstr "Proveedor"
 
 #. module: purchase_landed_cost
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line
-msgid "Supplier invoice line"
+msgid "Expense invoice line"
 msgstr "Línea de factura de proveedor"
 
 #. module: purchase_landed_cost

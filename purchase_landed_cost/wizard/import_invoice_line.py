@@ -5,7 +5,7 @@ from odoo import api, fields, models
 
 class ImportInvoiceLine(models.TransientModel):
     _name = "import.invoice.line.wizard"
-    _description = "Import supplier invoice line"
+    _description = "Import Expense Invoice line"
 
     supplier = fields.Many2one(
         comodel_name='res.partner', string='Supplier', required=True,

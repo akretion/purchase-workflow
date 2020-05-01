@@ -378,7 +378,7 @@ msgstr "导入入库"
 
 #. module: purchase_landed_cost
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_cost_distribution_form
-msgid "Import invoice line"
+msgid "Import Expense Invoice line"
 msgstr "导入发票行"
 
 #. module: purchase_landed_cost
@@ -394,7 +394,7 @@ msgstr "导入拣货到岸成本"
 #. module: purchase_landed_cost
 #: model:ir.actions.act_window,name:purchase_landed_cost.action_import_invoice_line_wizard
 #: model:ir.model,name:purchase_landed_cost.model_import_invoice_line_wizard
-msgid "Import supplier invoice line"
+msgid "Import Expense Invoice line"
 msgstr "导入供应商发票行"
 
 #. module: purchase_landed_cost
@@ -670,7 +670,7 @@ msgstr "选择入库向导"
 
 #. module: purchase_landed_cost
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.import_invoice_line_wizard_view
-msgid "Select supplier invoice line wizard"
+msgid "Select Expense invoice line wizard"
 msgstr "选择供应商发票行向导"
 
 #. module: purchase_landed_cost
@@ -692,7 +692,7 @@ msgstr "供应商"
 
 #. module: purchase_landed_cost
 #: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line
-msgid "Supplier invoice line"
+msgid "Expense invoice line"
 msgstr "供应商发票行"
 
 #. module: purchase_landed_cost

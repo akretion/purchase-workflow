@@ -153,7 +153,7 @@
                         </page>
                         <page string="Expenses">
                             <button name="%(action_import_invoice_line_wizard)d"
-                                    string="Import invoice line"
+                                    string="Import Expense Invoice line"
                                     states="draft" type="action"/>
                             <field name="expense_lines" options="{'reload_on_button': true}">
                                 <tree string="Cost distribution expenses"

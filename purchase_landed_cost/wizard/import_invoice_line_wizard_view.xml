@@ -6,7 +6,7 @@
         <field name="model">import.invoice.line.wizard</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <form string="Select supplier invoice line wizard">
+            <form string="Select Expense invoice line wizard">
                 <group>
                     <field name="supplier"/>
                     <field name="invoice"/>
@@ -31,7 +31,7 @@
 
     <record id="action_import_invoice_line_wizard"
             model="ir.actions.act_window">
-        <field name="name">Import supplier invoice line</field>
+        <field name="name">Import Expense Invoice line</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">import.invoice.line.wizard</field>
         <field name="view_type">form</field>
