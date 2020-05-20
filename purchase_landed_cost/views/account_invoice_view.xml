@@ -5,18 +5,22 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_supplier_form"/>
         <field name="arch" type="xml">
-            <notebook position="inside">
-                <page string="Landed costs">
-                    <button name="%(purchase_landed_cost.action_import_landed_cost_pickings_wizard)d"
-                            string="Import from pickings"
-                            type="action"
-                    />
-                    <field name="expense_line_ids"
+            <xpath expr="//button[@name='action_invoice_draft']" position="after">
+                <button name="%(purchase_landed_cost.action_link_invoice_line_expense_wizard)d"
+                        string="Link to Landed Cost Expense"
+                        type="action"
+                        attrs="{'invisible': [('state', 'not in', ('open', 'paid'))]}"
+                />
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Landed Cost Expenses" attrs="{'invisible': [('expense_ids', '=', [])]}">
+                    <field name="expense_ids"
                            nolabel="1"
                            options="{'reload_on_button': true}"
+                           widget="many2many"
                     />
                 </page>
-            </notebook>
+            </xpath>
         </field>
     </record>
 

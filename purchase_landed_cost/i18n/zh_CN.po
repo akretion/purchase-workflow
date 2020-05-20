@@ -366,7 +366,7 @@ msgstr "导入"
 
 #. module: purchase_landed_cost
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.invoice_supplier_form
-msgid "Import from pickings"
+msgid "Link to Landed Cost Expense"
 msgstr "从拣货导入"
 
 #. module: purchase_landed_cost
@@ -382,13 +382,13 @@ msgid "Import Expense Invoice line"
 msgstr "导入发票行"
 
 #. module: purchase_landed_cost
-#: model:ir.actions.act_window,name:purchase_landed_cost.action_import_landed_cost_pickings_wizard
-msgid "Import landed cost from pickings"
+#: model:ir.actions.act_window,name:purchase_landed_cost.action_link_invoice_line_expense_wizard
+msgid "Link an Invoice line with Cost Distribution Expenses"
 msgstr "从拣货导入到岸成本"
 
 #. module: purchase_landed_cost
 #: model:ir.model,name:purchase_landed_cost.model_import_landed_cost_pickings_wizard
-msgid "Import landed cost pickings"
+msgid "Link an Invoice line with Cost Distribution Expensess"
 msgstr "导入拣货到岸成本"
 
 #. module: purchase_landed_cost
@@ -425,12 +425,12 @@ msgid "Invoice line"
 msgstr "发票行"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_account_invoice__expense_line_ids
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_account_invoice_line__expense_line_ids
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_account_invoice__expense_ids
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_account_invoice_line__expense_ids
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.invoice_supplier_form
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_order_form
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.view_picking_form
-msgid "Landed costs"
+msgid "Cost Distribution Expenses"
 msgstr "到岸成本"
 
 #. module: purchase_landed_cost

@@ -552,26 +552,38 @@ class PurchaseCostDistributionExpense(models.Model):
         string='Expense amount', digits=dp.get_precision('Account'),
         required=True)
     invoice_line = fields.Many2one(
+        help="The Invoice line from the Bill used to pay the Expense. It can only come\
+        from an 'Open' or 'Paid' bill.",
         comodel_name='account.invoice.line', string="Expense invoice line",
         domain="[('invoice_id.type', '=', 'in_invoice'),"
                "('invoice_id.state', 'in', ('open', 'paid'))]")
     invoice_id = fields.Many2one(
-        comodel_name='account.invoice', string="Invoice")
-    display_name = fields.Char(compute="_compute_display_name", store=True)
+        comodel_name='account.invoice', string="Invoice", store="True")
     company_id = fields.Many2one(
         comodel_name="res.company", related="distribution.company_id",
         store=True,
     )
 
     @api.multi
-    @api.depends('distribution', 'type', 'expense_amount', 'ref')
-    def _compute_display_name(self):
-        for record in self:
-            record.display_name = "%s: %s - %s (%s)" % (
-                record.distribution.name, record.type.name, record.ref,
-                formatLang(record.env, record.expense_amount,
-                           currency_obj=record.distribution.currency_id)
-            )
+    def name_get(self):
+        res = []
+        for expense in self:
+            expense_data = {
+                "distribution": expense.distribution.name,
+                "type": expense.type.name,
+                "ref": expense.ref,
+                "amount": formatLang(
+                    expense.env,
+                    expense.expense_amount,
+                    currency_obj=expense.distribution.currency_id,
+                ),
+            }
+            if expense_data.get("ref"):
+                name = "{distribution}: {type} - {ref} {amount}".format(**expense_data)
+            else:
+                name = "{distribution}: {type} - {amount}".format(**expense_data)
+            res.append((expense.id, name))
+        return res
 
     @api.onchange('type')
     def onchange_type(self):
@@ -588,14 +600,15 @@ class PurchaseCostDistributionExpense(models.Model):
     @api.onchange('invoice_line')
     def onchange_invoice_line(self):
         """set expense_amount in the currency of the distribution"""
-        self.invoice_id = self.invoice_line.invoice_id.id
-        currency_from = self.invoice_line.company_id.currency_id
-        amount = self.invoice_line.price_subtotal
-        currency_to = self.distribution.currency_id
-        company = self.company_id or self.env.user.company_id
-        cost_date = self.distribution.date or fields.Date.today()
-        self.expense_amount = currency_from._convert(amount, currency_to,
-                                                     company, cost_date)
+        if self.invoice_line:
+            self.invoice_id = self.invoice_line.invoice_id.id
+            currency_from = self.invoice_line.company_id.currency_id
+            amount = self.invoice_line.price_subtotal
+            currency_to = self.distribution.currency_id
+            company = self.company_id or self.env.user.company_id
+            cost_date = self.distribution.date or fields.Date.today()
+            self.expense_amount = currency_from._convert(amount, currency_to,
+                                                         company, cost_date)
 
     @api.multi
     def button_duplicate(self):

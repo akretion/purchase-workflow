@@ -22,7 +22,7 @@
         'security/ir.model.access.csv',
         'wizard/picking_import_wizard_view.xml',
         'wizard/import_invoice_line_wizard_view.xml',
-        'wizard/import_landed_cost_pickings_wizard_view.xml',
+        'wizard/link_invoice_line_expense_wizard_view.xml',
         'views/account_invoice_view.xml',
         'views/purchase_cost_distribution_view.xml',
         'views/purchase_cost_distribution_line_expense_view.xml',

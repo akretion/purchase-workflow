@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="import_landed_cost_pickings_wizard_view">
+        <field name="model">link.invoice.line.expense.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <group class="col-12 col-lg-6">
+                <field name="invoice_line_id"
+                       domain="[('invoice_id', '=', active_id)]" />
+            </group>
+            <separator />
+            <group class="col-12 col-lg-6">
+                <field name="cost_distribution_id" />
+                <field name="expense_ids" widget="many2many_tags"
+                       domain="[('distribution', '=', cost_distribution_id)]"
+                       context="{
+                                    'default_distribution': cost_distribution_id,
+                                    'default_invoice_id': active_id,
+                                    'default_invoice_line': invoice_line_id,
+                                }" />
+            </group>
+            <footer>
+                <button name="button_import" string="Import" type="object"
+                        class="oe_highlight" />
+                or
+                <button string="Cancel" class="oe_link" special="cancel" />
+            </footer>
+        </field>
+    </record>
+
+    <record id="action_link_invoice_line_expense_wizard" model="ir.actions.act_window">
+        <field name="name">Link an Invoice line with Cost Distribution Expenses</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">link.invoice.line.expense.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
