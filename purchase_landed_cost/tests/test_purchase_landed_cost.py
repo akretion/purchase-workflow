@@ -12,6 +12,7 @@ class TestPurchaseLandedCost(common.SavepointCase):
     def setUpClass(cls):
         super(TestPurchaseLandedCost, cls).setUpClass()
         expense_type_obj = cls.env['purchase.expense.type']
+        # Different Expense types
         cls.type_amount = expense_type_obj.create({
             'name': 'Type Amount',
             'calculation_method': 'amount',
@@ -37,9 +38,11 @@ class TestPurchaseLandedCost(common.SavepointCase):
             'name': 'Type Equal',
             'calculation_method': 'equal',
         })
+        # Cost distribution
         cls.distribution = cls.env['purchase.cost.distribution'].create({
             'name': '/',
         })
+        # Purchase Order and Picking
         cls.product = cls.env['product.product'].create({
             'name': 'Product',
             'type': 'product',
@@ -66,6 +69,7 @@ class TestPurchaseLandedCost(common.SavepointCase):
             'pick_ids': [(4, cls.picking.id)],
         }).process()
         cls.picking.action_done()
+        # Expense's Invoice
         user_type = cls.env.ref('account.data_account_type_expenses')
         account = cls.env['account.account'].create({
             'name': 'Account',
@@ -82,6 +86,7 @@ class TestPurchaseLandedCost(common.SavepointCase):
             })]
         })
         cls.invoice.action_invoice_open()
+        # Expense created with the "Import Expense invoice line" wizard
         wiz = cls.env['import.invoice.line.wizard'].with_context(
             active_id=cls.distribution.id,
         ).create({
@@ -91,6 +96,23 @@ class TestPurchaseLandedCost(common.SavepointCase):
             'expense_type': cls.type_qty.id,
         })
         wiz.action_import_invoice_line()
+        cls.expense = cls.env["purchase.cost.distribution.expense"].search(
+            [("ref", "=", "Test service")]
+        )
+        # Another Cost distribution to check link between Expenses and Invoice lines
+        cls.distribution_1 = cls.env['purchase.cost.distribution'].create({
+            'name': '/',
+        })
+        cls.expense_1 = cls.env["purchase.cost.distribution.expense"].create({
+            'distribution': cls.distribution_1.id,
+            'type': cls.type_amount.id,
+            'expense_amount': 10.0,
+        })
+        cls.expense_2 = cls.env["purchase.cost.distribution.expense"].create({
+            'distribution': cls.distribution_1.id,
+            'type': cls.type_qty.id,
+            'expense_amount': 20.0,
+        })
 
     def test_distribution_without_lines(self):
         self.assertNotEqual(self.distribution.name, '/')
@@ -186,3 +208,43 @@ class TestPurchaseLandedCost(common.SavepointCase):
         self.assertAlmostEqual(self.product.standard_price, 2.67, 2)
         self.distribution.action_cancel()
         self.assertAlmostEqual(self.product.standard_price, 2)
+
+    def test_expense_in_invoice_from_import_invoice_wizard(self):
+        self.assertEqual(self.invoice.expense_ids.ids, [self.expense.id])
+
+    def test_remove_invoice_line_in_expense(self):
+        self.expense.invoice_line = False
+        self.assertEqual(self.invoice.expense_ids.ids, [])
+
+    def test_add_invoice_line_to_expense(self):
+        self.invoice.expense_ids = [(6, 0, [])]
+        for expense in self.distribution_1.expense_ids:
+            expense.invoice_line = self.invoice.invoice_line_ids[0].id
+            expense.invoice_id = self.invoice.id
+
+        self.assertEqual(self.distribution_1.expense_ids, self.invoice.expense_ids)
+
+    def test_remove_expense_in_invoice(self):
+        expense = self.distribution_1.expense_ids[0]
+        self.invoice.expense_ids = [(6, 0, [expense.id])]
+        self.invoice.expense_ids = [(3, expense.id, 0)]
+        self.assertFalse(expense.invoice_line)
+
+    def test_unlink_expense(self):
+        expense = self.distribution_1.expense_ids[0]
+        expense.invoice_line = self.invoice.invoice_line_ids[0].id
+        self.assertIn(expense, self.invoice.expense_ids)
+        expense.unlink()
+        self.assertNotIn(expense, self.invoice.expense_ids)
+
+    def test_link_invoice_line_expense_wizard(self):
+        self.invoice.expense_ids = [(6, 0, [])]
+        wiz = self.env["link.invoice.line.expense.wizard"].with_context(
+            active_id=self.invoice.id,
+        ).create({
+            'invoice_line_id': self.invoice.invoice_line_ids[0].id,
+            'cost_distribution_id': self.distribution_1.id,
+            'expense_ids': [(6, 0, self.distribution_1.expense_ids.ids)],
+        })
+        wiz.button_import()
+        self.assertEqual(self.distribution_1.expense_ids, self.invoice.expense_ids)
