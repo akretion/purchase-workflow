@@ -112,7 +112,7 @@ class TestPurchaseLandedCost(common.SavepointCase):
         self.assertAlmostEqual(self.distribution.total_purchase, 15.0)
         self.assertAlmostEqual(self.distribution.amount_total, 25.0)
         # Expense part
-        self.assertEqual(len(self.distribution.expense_lines.ids), 1)
+        self.assertEqual(len(self.distribution.expense_ids.ids), 1)
         self.assertAlmostEqual(self.distribution.total_uom_qty, 5.0)
         self.distribution.action_calculate()
         self.assertAlmostEqual(self.distribution.cost_lines[0].cost_ratio, 2)

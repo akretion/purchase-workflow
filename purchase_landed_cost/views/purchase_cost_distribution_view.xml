@@ -155,7 +155,7 @@
                             <button name="%(action_import_invoice_line_wizard)d"
                                     string="Import Expense Invoice line"
                                     states="draft" type="action"/>
-                            <field name="expense_lines" options="{'reload_on_button': true}">
+                            <field name="expense_ids" options="{'reload_on_button': true}">
                                 <tree string="Cost distribution expenses"
                                       editable="bottom">
                                     <field name="type"/>
@@ -212,7 +212,7 @@
             <search string="Search purchase costs distributions">
                 <field name="name"/>
                 <field name="cost_lines"/>
-                <field name="expense_lines"/>
+                <field name="expense_ids"/>
             </search>
         </field>
     </record>
@@ -269,8 +269,8 @@
                         <field name="total_weight"/>
                     </group>
                 </group>
-                <field name="expense_lines" readonly="1">
-                    <tree string="Cost Line Expenses">
+                <field name="line_expense_ids" readonly="1">
+                    <tree string="Distribution Line Expenses">
                         <field name="type"/>
                         <field name="expense_amount" sum="Total Expenses"/>
                         <field name="cost_ratio" sum="Calculated Cost"/>

@@ -314,13 +314,13 @@ msgid "Expense type"
 msgstr "费用类型"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__expense_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__expense_ids
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_cost_distribution_form
 msgid "Expenses"
 msgstr "费用"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__expense_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__expense_ids
 msgid "Expenses distribution lines"
 msgstr "费用分摊行"
 
