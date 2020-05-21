@@ -13,8 +13,8 @@ class PickingImportWizard(models.TransientModel):
             distribution = self.env['purchase.cost.distribution'].browse(
                 self.env.context['active_id'])
             pickings = self.env['stock.picking']
-            moves = distribution.mapped('cost_lines.move_id')
-            for line in distribution.cost_lines:
+            moves = distribution.mapped('distrib_line_ids.move_id')
+            for line in distribution.distrib_line_ids:
                 if line.picking_id in pickings:
                     continue
                 if all(x in moves for x in line.picking_id.move_lines):
@@ -33,7 +33,7 @@ class PickingImportWizard(models.TransientModel):
 
     def _prepare_distribution_line(self, move):
         return {
-            'distribution': self.env.context['active_id'],
+            'distrib_id': self.env.context['active_id'],
             'move_id': move.id,
         }
 
@@ -42,7 +42,7 @@ class PickingImportWizard(models.TransientModel):
         self.ensure_one()
         distribution = self.env['purchase.cost.distribution'].browse(
             self.env.context['active_id'])
-        previous_moves = distribution.mapped('cost_lines.move_id')
+        previous_moves = distribution.mapped('distrib_line_ids.move_id')
         for move in self.mapped('pickings.move_lines'):
             if move not in previous_moves:
                 self.env['purchase.cost.distribution.line'].create(

@@ -20,7 +20,7 @@ msgstr ""
 "X-Generator: Weblate 3.10\n"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_line_ids
 msgid "Affected lines"
 msgstr "Mouvement de réception affecté"
 
@@ -124,8 +124,8 @@ msgid "Cost amount"
 msgstr "Montant des frais"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distribution
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__distribution
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distrib_id
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__distrib_id
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_cost_distribution_form
 msgid "Cost distribution"
 msgstr "Distribution de frais d'approche"
@@ -137,7 +137,7 @@ msgid "Cost distribution expenses"
 msgstr "Frais d'approche"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__distribution_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__distrib_line_id
 msgid "Cost distribution line"
 msgstr "Ligne de distribution de frais d'approche"
 
@@ -263,7 +263,7 @@ msgid "Distribution expense"
 msgstr "Distribution de frais"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__cost_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__distrib_line_ids
 msgid "Distribution lines"
 msgstr "Lignes de frais des opérations"
 
@@ -411,7 +411,7 @@ msgid "Import supplier invoice line"
 msgstr "Importer une ligne de Facture de fournisseur"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__imported_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distrib_line_ids
 msgid "Imported lines"
 msgstr "Lignes importées"
 
@@ -649,7 +649,7 @@ msgid "Purchase order line"
 msgstr "Ligne de Bon de commande"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,help:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_lines
+#: model:ir.model.fields,help:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_line_ids
 msgid ""
 "Put here specific lines that this expense is going to be distributed across. "
 "Leave it blank to use all imported lines."

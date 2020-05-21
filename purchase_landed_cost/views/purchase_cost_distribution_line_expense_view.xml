@@ -20,7 +20,7 @@
         <field name="arch" type="xml">
             <tree string="Purchase cost distribution lines">
                 <field name="picking_id" invisible="1"/>
-                <field name="distribution_line" />
+                <field name="distrib_line_id" />
                 <field name="distribution_expense" />
                 <field name="expense_amount" />
                 <field name="cost_ratio" />
@@ -33,7 +33,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="picking_id"/>
-                <field name="distribution_line" />
+                <field name="distrib_line_id" />
                 <field name="distribution_expense" />
                 <group expand="0" string="Group By">
                     <filter name="group_by_picking" string="Picking" context="{'group_by': 'picking_id'}"/>

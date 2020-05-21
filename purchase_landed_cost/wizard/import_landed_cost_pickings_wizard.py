@@ -21,7 +21,7 @@ class ImportLandedCostPickingsWizard(models.TransientModel):
         if 'possible_picking_ids' in fields_list:
             expenses = self.env['purchase.cost.distribution.expense'].search(
                 [])
-            pickings = expenses.mapped('distribution.cost_lines.picking_id')
+            pickings = expenses.mapped('distrib_id.distrib_line_ids.picking_id')
             res['possible_picking_ids'] = [(6, 0, pickings.ids)]
         return res
 
@@ -31,5 +31,5 @@ class ImportLandedCostPickingsWizard(models.TransientModel):
         invoice_id = self.env.context['active_id']
         dist_lines = self.env['purchase.cost.distribution.line'].search(
             [('picking_id', 'in', self.picking_ids.ids)])
-        exp_lines = dist_lines.mapped('distribution.expense_lines')
+        exp_lines = dist_lines.mapped('distrib_id.expense_lines')
         exp_lines.write({'invoice_id': invoice_id})

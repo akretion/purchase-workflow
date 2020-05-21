@@ -44,7 +44,7 @@
                 <field name="total_purchase"/>
                 <field name="total_expense"/>
                 <field name="amount_total"/>
-                <field name="cost_lines"/>
+                <field name="distrib_line_ids"/>
                 <field name="state"/>
                 <field name="company_id" groups="base.group_multi_company"/>
             </tree>
@@ -134,9 +134,9 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Picking lines">
-                            <field name="cost_lines">
-                                <tree string="Costs distribution picking lines"
+                        <page string="Stock Moves">
+                            <field name="distrib_line_ids">
+                                <tree string="Costs distribution lines"
                                       create="false">
                                     <field name="picking_id"/>
                                     <field name="move_id"/>
@@ -162,9 +162,9 @@
                                     <field name="calculation_method"/>
                                     <field name="ref"/>
                                     <field name="expense_amount"/>
-                                    <field name="imported_lines"
+                                    <field name="distrib_line_ids"
                                            invisible="1"/>
-                                    <field name="affected_lines"
+                                    <field name="affected_line_ids"
                                            widget="many2many_tags"/>
                                     <field name="invoice_line"
                                            options="{'no_create': true, 'create_edit': false}"/>
@@ -211,7 +211,7 @@
         <field name="arch" type="xml">
             <search string="Search purchase costs distributions">
                 <field name="name"/>
-                <field name="cost_lines"/>
+                <field name="distrib_line_ids"/>
                 <field name="expense_lines"/>
             </search>
         </field>
@@ -294,7 +294,7 @@
                 <field name="type"/>
                 <field name="calculation_method"/>
                 <field name="expense_amount"/>
-                <field name="distribution" readonly="1"/>
+                <field name="distrib_id" readonly="1"/>
                 <button name="button_duplicate"
                         string="Duplicate expense"
                         type="object"

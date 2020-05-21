@@ -23,39 +23,39 @@ class PurchaseCostDistribution(models.Model):
                 distribution.total_expense
 
     @api.multi
-    @api.depends('cost_lines', 'cost_lines.total_amount')
+    @api.depends('distrib_line_ids', 'distrib_line_ids.total_amount')
     def _compute_total_purchase(self):
         for distribution in self:
             distribution.total_purchase = sum([x.total_amount for x in
-                                               distribution.cost_lines])
+                                               distribution.distrib_line_ids])
 
     @api.multi
-    @api.depends('cost_lines', 'cost_lines.product_price_unit')
+    @api.depends('distrib_line_ids', 'distrib_line_ids.product_price_unit')
     def _compute_total_price_unit(self):
         for distribution in self:
             distribution.total_price_unit = sum([x.product_price_unit for x in
-                                                 distribution.cost_lines])
+                                                 distribution.distrib_line_ids])
 
     @api.multi
-    @api.depends('cost_lines', 'cost_lines.product_qty')
+    @api.depends('distrib_line_ids', 'distrib_line_ids.product_qty')
     def _compute_total_uom_qty(self):
         for distribution in self:
             distribution.total_uom_qty = sum([x.product_qty for x in
-                                              distribution.cost_lines])
+                                              distribution.distrib_line_ids])
 
     @api.multi
-    @api.depends('cost_lines', 'cost_lines.total_weight')
+    @api.depends('distrib_line_ids', 'distrib_line_ids.total_weight')
     def _compute_total_weight(self):
         for distribution in self:
             distribution.total_weight = sum([x.total_weight for x in
-                                             distribution.cost_lines])
+                                             distribution.distrib_line_ids])
 
     @api.multi
-    @api.depends('cost_lines', 'cost_lines.total_volume')
+    @api.depends('distrib_line_ids', 'distrib_line_ids.total_volume')
     def _compute_total_volume(self):
         for distribution in self:
             distribution.total_volume = sum([x.total_volume for x in
-                                             distribution.cost_lines])
+                                             distribution.distrib_line_ids])
 
     @api.multi
     @api.depends('expense_lines', 'expense_lines.expense_amount')
@@ -116,12 +116,12 @@ class PurchaseCostDistribution(models.Model):
         compute=_compute_total_expense,
         digits=dp.get_precision('Account'), string='Total expenses')
     note = fields.Text(string='Documentation for this order')
-    cost_lines = fields.One2many(
+    distrib_line_ids = fields.One2many(
         comodel_name='purchase.cost.distribution.line', ondelete="cascade",
-        inverse_name='distribution', string='Distribution lines')
+        inverse_name='distrib_id', string='Distribution lines')
     expense_lines = fields.One2many(
         comodel_name='purchase.cost.distribution.expense', ondelete="cascade",
-        inverse_name='distribution', string='Expenses',
+        inverse_name='distrib_id', string='Expenses',
         default=_expense_lines_default)
 
     @api.multi
@@ -141,13 +141,13 @@ class PurchaseCostDistribution(models.Model):
 
     @api.multi
     def write(self, vals):
-        for command in vals.get('cost_lines', []):
+        for command in vals.get('distrib_line_ids', []):
             if command[0] in (2, 3, 5):
                 if command[0] == 5:
-                    to_check = self.mapped('cost_lines').ids
+                    to_check = self.mapped('distrib_line_ids').ids
                 else:
                     to_check = [command[1]]
-                lines = self.mapped('expense_lines.affected_lines').ids
+                lines = self.mapped('expense_lines.affected_line_ids').ids
                 if any(i in lines for i in to_check):
                     raise UserError(
                         _("You can't delete a cost line if it's an "
@@ -155,47 +155,47 @@ class PurchaseCostDistribution(models.Model):
         return super(PurchaseCostDistribution, self).write(vals)
 
     @api.model
-    def _prepare_expense_line(self, expense_line, cost_line):
-        distribution = cost_line.distribution
+    def _prepare_expense_line(self, expense_line, distrib_line):
+        distribution = distrib_line.distrib_id
         if expense_line.type.calculation_method == 'amount':
-            multiplier = cost_line.total_amount
-            if expense_line.affected_lines:
+            multiplier = distrib_line.total_amount
+            if expense_line.affected_line_ids:
                 divisor = sum([x.total_amount for x in
-                               expense_line.affected_lines])
+                               expense_line.affected_line_ids])
             else:
                 divisor = distribution.total_purchase
         elif expense_line.type.calculation_method == 'price':
-            multiplier = cost_line.product_price_unit
-            if expense_line.affected_lines:
+            multiplier = distrib_line.product_price_unit
+            if expense_line.affected_line_ids:
                 divisor = sum([x.product_price_unit for x in
-                               expense_line.affected_lines])
+                               expense_line.affected_line_ids])
             else:
                 divisor = distribution.total_price_unit
         elif expense_line.type.calculation_method == 'qty':
-            multiplier = cost_line.product_qty
-            if expense_line.affected_lines:
+            multiplier = distrib_line.product_qty
+            if expense_line.affected_line_ids:
                 divisor = sum([x.product_qty for x in
-                               expense_line.affected_lines])
+                               expense_line.affected_line_ids])
             else:
                 divisor = distribution.total_uom_qty
         elif expense_line.type.calculation_method == 'weight':
-            multiplier = cost_line.total_weight
-            if expense_line.affected_lines:
+            multiplier = distrib_line.total_weight
+            if expense_line.affected_line_ids:
                 divisor = sum([x.total_weight for x in
-                               expense_line.affected_lines])
+                               expense_line.affected_line_ids])
             else:
                 divisor = distribution.total_weight
         elif expense_line.type.calculation_method == 'volume':
-            multiplier = cost_line.total_volume
-            if expense_line.affected_lines:
+            multiplier = distrib_line.total_volume
+            if expense_line.affected_line_ids:
                 divisor = sum([x.total_volume for x in
-                               expense_line.affected_lines])
+                               expense_line.affected_line_ids])
             else:
                 divisor = distribution.total_volume
         elif expense_line.type.calculation_method == 'equal':
             multiplier = 1
-            divisor = (len(expense_line.affected_lines) or
-                       len(distribution.cost_lines))
+            divisor = (len(expense_line.affected_line_ids) or
+                       len(distribution.distrib_line_ids))
         else:
             raise UserError(_('No valid distribution type.'))
         if divisor:
@@ -209,7 +209,7 @@ class PurchaseCostDistribution(models.Model):
         return {
             'distribution_expense': expense_line.id,
             'expense_amount': expense_amount,
-            'cost_ratio': expense_amount / cost_line.product_qty,
+            'cost_ratio': expense_amount / distrib_line.product_qty,
         }
 
     @api.multi
@@ -220,20 +220,20 @@ class PurchaseCostDistribution(models.Model):
                 raise UserError(
                     _('Please enter an amount for all the expenses'))
             # Check if exist lines in distribution
-            if not distribution.cost_lines:
+            if not distribution.distrib_line_ids:
                 raise UserError(
                     _('There is no picking lines in the distribution'))
             # Calculating expense line
-            for cost_line in distribution.cost_lines:
-                cost_line.expense_lines.unlink()
+            for distrib_line in distribution.distrib_line_ids:
+                distrib_line.expense_lines.unlink()
                 expense_lines = []
                 for expense in distribution.expense_lines:
-                    if (expense.affected_lines and
-                            cost_line not in expense.affected_lines):
+                    if (expense.affected_line_ids and
+                            distrib_line not in expense.affected_line_ids):
                         continue
                     expense_lines.append(
-                        self._prepare_expense_line(expense, cost_line))
-                cost_line.expense_lines = [(0, 0, x) for x in expense_lines]
+                        self._prepare_expense_line(expense, distrib_line))
+                distrib_line.expense_lines = [(0, 0, x) for x in expense_lines]
             distribution.state = 'calculated'
         return True
 
@@ -266,7 +266,7 @@ class PurchaseCostDistribution(models.Model):
         if self.cost_update_type != 'direct':
             return
         d = {}
-        for line in self.cost_lines:
+        for line in self.distrib_line_ids:
             product = line.move_id.product_id
             if (product.cost_method != 'average' or
                     line.move_id.location_id.usage != 'supplier'):
@@ -296,7 +296,7 @@ class PurchaseCostDistribution(models.Model):
         if self.cost_update_type != 'direct':
             return
         d = {}
-        for line in self.cost_lines:
+        for line in self.distrib_line_ids:
             product = line.move_id.product_id
             if (product.cost_method != 'average' or
                     line.move_id.location_id.usage != 'supplier'):
@@ -367,13 +367,13 @@ class PurchaseCostDistributionLine(models.Model):
             )
 
     @api.multi
-    @api.depends('distribution', 'distribution.name',
+    @api.depends('distrib_id', 'distrib_id.name',
                  'picking_id', 'picking_id.name',
                  'product_id', 'product_id.display_name')
     def _compute_name(self):
         for dist_line in self:
             dist_line.name = "%s: %s / %s" % (
-                dist_line.distribution.name, dist_line.picking_id.name,
+                dist_line.distrib_id.name, dist_line.picking_id.name,
                 dist_line.product_id.display_name,
             )
 
@@ -404,11 +404,11 @@ class PurchaseCostDistributionLine(models.Model):
     name = fields.Char(
         string='Name', compute='_compute_name', store=True,
     )
-    distribution = fields.Many2one(
+    distrib_id = fields.Many2one(
         comodel_name='purchase.cost.distribution', string='Cost distribution',
         ondelete='cascade', required=True)
     move_id = fields.Many2one(
-        comodel_name='stock.move', string='Picking line', ondelete="restrict",
+        comodel_name='stock.move', string='Stock Move', ondelete="restrict",
         required=True)
     purchase_line_id = fields.Many2one(
         comodel_name='purchase.order.line', string='Purchase order line',
@@ -434,7 +434,7 @@ class PurchaseCostDistributionLine(models.Model):
         string='Unit price', related='move_id.price_unit')
     expense_lines = fields.One2many(
         comodel_name='purchase.cost.distribution.line.expense',
-        inverse_name='distribution_line', string='Expenses distribution lines')
+        inverse_name='distrib_line_id', string='Expenses distribution lines')
     product_volume = fields.Float(
         string='Volume', help="The volume in m3.",
         related='product_id.product_tmpl_id.volume')
@@ -464,7 +464,7 @@ class PurchaseCostDistributionLine(models.Model):
         compute=_compute_total_volume, string='Line volume', store=True,
         help="The line volume in m3.")
     company_id = fields.Many2one(
-        comodel_name="res.company", related="distribution.company_id",
+        comodel_name="res.company", related="distrib_id.company_id",
         store=True,
     )
 
@@ -472,10 +472,9 @@ class PurchaseCostDistributionLine(models.Model):
     def get_action_purchase_cost_distribution(self):
         xml_id = 'purchase_landed_cost.action_purchase_cost_distribution'
         action = self.env.ref(xml_id).read()[0]
-        distributions = self.mapped('distribution')
+        distributions = self.mapped('distrib_id')
         if len(distributions) == 1:
-            form = self.env.ref(
-                'purchase_landed_cost.purchase_cost_distribution_form')
+            form = self.env.ref('purchase_landed_cost.purchase_cost_distribution_form')
             action['views'] = [(form.id, 'form')]
             action['res_id'] = distributions.id
         else:
@@ -487,13 +486,13 @@ class PurchaseCostDistributionLineExpense(models.Model):
     _name = "purchase.cost.distribution.line.expense"
     _description = "Purchase cost distribution line expense"
 
-    distribution_line = fields.Many2one(
+    distrib_line_id = fields.Many2one(
         comodel_name='purchase.cost.distribution.line',
         string='Cost distribution line', ondelete="cascade",
     )
     picking_id = fields.Many2one(
         comodel_name="stock.picking", store=True, readonly=True,
-        related="distribution_line.picking_id",
+        related="distrib_line_id.picking_id",
     )
     picking_date_done = fields.Datetime(
         related="picking_id.date_done", store=True, readonly=True,
@@ -511,7 +510,7 @@ class PurchaseCostDistributionLineExpense(models.Model):
     )
     cost_ratio = fields.Float('Unit cost')
     company_id = fields.Many2one(
-        comodel_name="res.company", related="distribution_line.company_id",
+        comodel_name="res.company", related="distrib_line_id.company_id",
         store=True, readonly=True,
     )
 
@@ -521,14 +520,14 @@ class PurchaseCostDistributionExpense(models.Model):
     _description = "Purchase cost distribution expense"
 
     @api.multi
-    @api.depends('distribution', 'distribution.cost_lines')
-    def _compute_imported_lines(self):
+    @api.depends('distrib_id', 'distrib_id.distrib_line_ids')
+    def _compute_distrib_line_ids(self):
         for record in self:
-            record.imported_lines = record.env[
+            record.distrib_line_ids = record.env[
                 'purchase.cost.distribution.line']
-            record.imported_lines |= record.distribution.cost_lines
+            record.distrib_line_ids |= record.distrib_id.distrib_line_ids
 
-    distribution = fields.Many2one(
+    distrib_id = fields.Many2one(
         comodel_name='purchase.cost.distribution', string='Cost distribution',
         index=True, ondelete="cascade", required=True)
     ref = fields.Char(string="Reference")
@@ -538,16 +537,16 @@ class PurchaseCostDistributionExpense(models.Model):
     calculation_method = fields.Selection(
         string='Calculation method', related='type.calculation_method',
         readonly=True)
-    imported_lines = fields.Many2many(
+    distrib_line_ids = fields.Many2many(
         comodel_name='purchase.cost.distribution.line',
-        string='Imported lines', compute='_compute_imported_lines')
-    affected_lines = fields.Many2many(
+        string='Cost distribution lines', compute='_compute_distrib_line_ids')
+    affected_line_ids = fields.Many2many(
         comodel_name='purchase.cost.distribution.line', column1="expense_id",
         relation="distribution_expense_aff_rel", column2="line_id",
         string='Affected lines',
         help="Put here specific lines that this expense is going to be "
-             "distributed across. Leave it blank to use all imported lines.",
-        domain="[('id', 'in', imported_lines)]")
+             "distributed across. Leave it blank to use all the Cost distribution lines.",
+        domain="[('id', 'in', distrib_line_ids)]")
     expense_amount = fields.Float(
         string='Expense amount', digits=dp.get_precision('Account'),
         required=True)
@@ -559,18 +558,18 @@ class PurchaseCostDistributionExpense(models.Model):
         comodel_name='account.invoice', string="Invoice")
     display_name = fields.Char(compute="_compute_display_name", store=True)
     company_id = fields.Many2one(
-        comodel_name="res.company", related="distribution.company_id",
+        comodel_name="res.company", related="distrib_id.company_id",
         store=True,
     )
 
     @api.multi
-    @api.depends('distribution', 'type', 'expense_amount', 'ref')
+    @api.depends('distrib_id', 'type', 'expense_amount', 'ref')
     def _compute_display_name(self):
         for record in self:
             record.display_name = "%s: %s - %s (%s)" % (
-                record.distribution.name, record.type.name, record.ref,
+                record.distrib_id.name, record.type.name, record.ref,
                 formatLang(record.env, record.expense_amount,
-                           currency_obj=record.distribution.currency_id)
+                           currency_obj=record.distrib_id.currency_id)
             )
 
     @api.onchange('type')
@@ -579,9 +578,9 @@ class PurchaseCostDistributionExpense(models.Model):
         if self.type and self.type.default_amount:
             currency_from = self.type.company_id.currency_id
             amount = self.type.default_amount
-            currency_to = self.distribution.currency_id
+            currency_to = self.distrib_id.currency_id
             company = self.company_id or self.env.user.company_id
-            cost_date = self.distribution.date or fields.Date.today()
+            cost_date = self.distrib_id.date or fields.Date.today()
             self.expense_amount = currency_from._convert(amount, currency_to,
                                                          company, cost_date)
 
@@ -591,9 +590,9 @@ class PurchaseCostDistributionExpense(models.Model):
         self.invoice_id = self.invoice_line.invoice_id.id
         currency_from = self.invoice_line.company_id.currency_id
         amount = self.invoice_line.price_subtotal
-        currency_to = self.distribution.currency_id
+        currency_to = self.distrib_id.currency_id
         company = self.company_id or self.env.user.company_id
-        cost_date = self.distribution.date or fields.Date.today()
+        cost_date = self.distrib_id.date or fields.Date.today()
         self.expense_amount = currency_from._convert(amount, currency_to,
                                                      company, cost_date)
 

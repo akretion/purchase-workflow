@@ -18,7 +18,7 @@ msgstr ""
 "X-Generator: Poedit 1.8.4\n"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_line_ids
 msgid "Affected lines"
 msgstr "Prizadete postavke"
 
@@ -125,8 +125,8 @@ msgid "Cost amount"
 msgstr "Privzeti znesek"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distribution
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__distribution
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distrib_id
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__distrib_id
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_cost_distribution_form
 msgid "Cost distribution"
 msgstr "Distribucija stroškov"
@@ -138,7 +138,7 @@ msgid "Cost distribution expenses"
 msgstr "Izdatki distribucije stroškov"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__distribution_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__distrib_line_id
 msgid "Cost distribution line"
 msgstr "Postavka distribucije stroškov"
 
@@ -261,7 +261,7 @@ msgid "Distribution expense"
 msgstr "Distribucijski izdatek"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__cost_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__distrib_line_ids
 msgid "Distribution lines"
 msgstr "Distribucijske postavke"
 
@@ -414,7 +414,7 @@ msgid "Import supplier invoice line"
 msgstr "Uvoz postavke prejetega računa"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__imported_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distrib_line_ids
 #, fuzzy
 msgid "Imported lines"
 msgstr "Uvoz postavke računa"
@@ -660,7 +660,7 @@ msgid "Purchase order line"
 msgstr "Nabavni nalog"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,help:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_lines
+#: model:ir.model.fields,help:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_line_ids
 msgid ""
 "Put here specific lines that this expense is going to be distributed across. "
 "Leave it blank to use all imported lines."

@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_line_ids
 msgid "Affected lines"
 msgstr "Líneas afectadas"
 
@@ -122,8 +122,8 @@ msgid "Cost amount"
 msgstr "Importe coste"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distribution
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__distribution
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distrib_id
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line__distrib_id
 #: model_terms:ir.ui.view,arch_db:purchase_landed_cost.purchase_cost_distribution_form
 msgid "Cost distribution"
 msgstr "Distribución de costes"
@@ -135,7 +135,7 @@ msgid "Cost distribution expenses"
 msgstr "Gastos de la distribución de costes"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__distribution_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__distrib_line_id
 msgid "Cost distribution line"
 msgstr "Línea de distribución de costes"
 
@@ -258,7 +258,7 @@ msgid "Distribution expense"
 msgstr "Gasto de la distribución"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__cost_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution__distrib_line_ids
 msgid "Distribution lines"
 msgstr "Líneas de distribución"
 
@@ -408,7 +408,7 @@ msgid "Import supplier invoice line"
 msgstr "Importar línea de factura de proveedor"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__imported_lines
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__distrib_line_ids
 msgid "Imported lines"
 msgstr "Líneas importadas"
 
@@ -645,7 +645,7 @@ msgid "Purchase order line"
 msgstr "Linea de pedido de compra"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,help:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_lines
+#: model:ir.model.fields,help:purchase_landed_cost.field_purchase_cost_distribution_expense__affected_line_ids
 msgid ""
 "Put here specific lines that this expense is going to be distributed across. "
 "Leave it blank to use all imported lines."

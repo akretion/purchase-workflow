@@ -34,7 +34,7 @@ class ImportInvoiceLine(models.TransientModel):
         expense_amount = currency_from._convert(amount, currency_to, company,
                                                 cost_date)
         self.env['purchase.cost.distribution.expense'].create({
-            'distribution': dist_id,
+            'distrib_id': dist_id,
             'invoice_line': self.invoice_line.id,
             'invoice_id': self.invoice_line.invoice_id.id,
             'ref': self.invoice_line.name,
