@@ -14,7 +14,7 @@ class ImportInvoiceLine(models.TransientModel):
         comodel_name='account.invoice', string="Invoice", required=True,
         domain="[('partner_id', '=', supplier), ('type', '=', 'in_invoice'),"
                "('state', 'in', ['open', 'paid'])]")
-    invoice_line = fields.Many2one(
+    invoice_line_id = fields.Many2one(
         comodel_name='account.invoice.line', string="Invoice line",
         required=True, domain="[('invoice_id', '=', invoice)]")
     expense_type = fields.Many2one(
@@ -26,8 +26,8 @@ class ImportInvoiceLine(models.TransientModel):
         self.ensure_one()
         dist_id = self.env.context['active_id']
         distribution = self.env['purchase.cost.distribution'].browse(dist_id)
-        currency_from = self.invoice_line.company_id.currency_id
-        amount = self.invoice_line.price_subtotal
+        currency_from = self.invoice_line_id.company_id.currency_id
+        amount = self.invoice_line_id.price_subtotal
         currency_to = distribution.currency_id
         company = distribution.company_id or self.env.user.company_id
         cost_date = distribution.date or fields.Date.today()
@@ -35,9 +35,9 @@ class ImportInvoiceLine(models.TransientModel):
                                                 cost_date)
         self.env['purchase.cost.distribution.expense'].create({
             'distribution': dist_id,
-            'invoice_line': self.invoice_line.id,
-            'invoice_id': self.invoice_line.invoice_id.id,
-            'ref': self.invoice_line.name,
+            'invoice_line_id': self.invoice_line_id.id,
+            'invoice_id': self.invoice_line_id.invoice_id.id,
+            'ref': self.invoice_line_id.name,
             'expense_amount': expense_amount,
             'type': self.expense_type.id,
         })

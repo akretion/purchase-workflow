@@ -10,7 +10,7 @@
                 <group>
                     <field name="supplier"/>
                     <field name="invoice"/>
-                    <field name="invoice_line"/>
+                    <field name="invoice_line_id"/>
                 </group>
                 <group>
                     <field name="expense_type"/>

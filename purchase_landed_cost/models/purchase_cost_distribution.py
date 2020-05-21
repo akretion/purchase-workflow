@@ -553,7 +553,7 @@ class PurchaseCostDistributionExpense(models.Model):
     expense_amount = fields.Float(
         string='Expense amount', digits=dp.get_precision('Account'),
         required=True)
-    invoice_line = fields.Many2one(
+    invoice_line_id = fields.Many2one(
         help="The Invoice line from the Bill used to pay the Expense. It can only come\
         from an 'Open' or 'Paid' bill.",
         comodel_name='account.invoice.line', string="Expense invoice line",
@@ -599,13 +599,13 @@ class PurchaseCostDistributionExpense(models.Model):
             self.expense_amount = currency_from._convert(amount, currency_to,
                                                          company, cost_date)
 
-    @api.onchange('invoice_line')
+    @api.onchange('invoice_line_id')
     def onchange_invoice_line(self):
         """set expense_amount in the currency of the distribution"""
-        if self.invoice_line:
-            self.invoice_id = self.invoice_line.invoice_id.id
-            currency_from = self.invoice_line.company_id.currency_id
-            amount = self.invoice_line.price_subtotal
+        if self.invoice_line_id:
+            self.invoice_id = self.invoice_line_id.invoice_id.id
+            currency_from = self.invoice_line_id.company_id.currency_id
+            amount = self.invoice_line_id.price_subtotal
             currency_to = self.distribution.currency_id
             company = self.company_id or self.env.user.company_id
             cost_date = self.distribution.date or fields.Date.today()

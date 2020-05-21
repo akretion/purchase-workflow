@@ -420,7 +420,7 @@ msgid "Invoice Line"
 msgstr "发票行"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_import_invoice_line_wizard__invoice_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_import_invoice_line_wizard__invoice_line_id
 msgid "Invoice line"
 msgstr "发票行"
 
@@ -691,7 +691,7 @@ msgid "Supplier"
 msgstr "供应商"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line_id
 msgid "Expense invoice line"
 msgstr "供应商发票行"
 

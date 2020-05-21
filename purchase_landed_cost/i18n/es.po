@@ -430,7 +430,7 @@ msgid "Invoice Line"
 msgstr "Línea de factura"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_import_invoice_line_wizard__invoice_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_import_invoice_line_wizard__invoice_line_id
 msgid "Invoice line"
 msgstr "Línea de factura"
 
@@ -712,7 +712,7 @@ msgid "Supplier"
 msgstr "Proveedor"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line_id
 msgid "Expense invoice line"
 msgstr "Línea de factura de proveedor"
 

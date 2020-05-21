@@ -92,7 +92,7 @@ class TestPurchaseLandedCost(common.SavepointCase):
         ).create({
             'supplier': cls.supplier.id,
             'invoice': cls.invoice.id,
-            'invoice_line': cls.invoice.invoice_line_ids[:1].id,
+            'invoice_line_id': cls.invoice.invoice_line_ids[:1].id,
             'expense_type': cls.type_qty.id,
         })
         wiz.action_import_invoice_line()
@@ -213,13 +213,13 @@ class TestPurchaseLandedCost(common.SavepointCase):
         self.assertEqual(self.invoice.expense_ids.ids, [self.expense.id])
 
     def test_remove_invoice_line_in_expense(self):
-        self.expense.invoice_line = False
+        self.expense.invoice_line_id = False
         self.assertEqual(self.invoice.expense_ids.ids, [])
 
     def test_add_invoice_line_to_expense(self):
         self.invoice.expense_ids = [(6, 0, [])]
         for expense in self.distribution_1.expense_ids:
-            expense.invoice_line = self.invoice.invoice_line_ids[0].id
+            expense.invoice_line_id = self.invoice.invoice_line_ids[0].id
             expense.invoice_id = self.invoice.id
 
         self.assertEqual(self.distribution_1.expense_ids, self.invoice.expense_ids)
@@ -228,11 +228,11 @@ class TestPurchaseLandedCost(common.SavepointCase):
         expense = self.distribution_1.expense_ids[0]
         self.invoice.expense_ids = [(6, 0, [expense.id])]
         self.invoice.expense_ids = [(3, expense.id, 0)]
-        self.assertFalse(expense.invoice_line)
+        self.assertFalse(expense.invoice_line_id)
 
     def test_unlink_expense(self):
         expense = self.distribution_1.expense_ids[0]
-        expense.invoice_line = self.invoice.invoice_line_ids[0].id
+        expense.invoice_line_id = self.invoice.invoice_line_ids[0].id
         self.assertIn(expense, self.invoice.expense_ids)
         expense.unlink()
         self.assertNotIn(expense, self.invoice.expense_ids)

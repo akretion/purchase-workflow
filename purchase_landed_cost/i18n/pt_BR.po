@@ -426,7 +426,7 @@ msgid "Invoice Line"
 msgstr "Fatura"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_import_invoice_line_wizard__invoice_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_import_invoice_line_wizard__invoice_line_id
 msgid "Invoice line"
 msgstr ""
 
@@ -707,7 +707,7 @@ msgid "Supplier"
 msgstr ""
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_expense__invoice_line_id
 msgid "Expense invoice line"
 msgstr ""
 

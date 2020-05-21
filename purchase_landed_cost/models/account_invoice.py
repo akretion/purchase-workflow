@@ -41,6 +41,6 @@ class AccountInvoiceLine(models.Model):
 
     expense_ids = fields.One2many(
         comodel_name="purchase.cost.distribution.expense",
-        inverse_name="invoice_line",
+        inverse_name="invoice_line_id",
         string="Cost Distribution Expenses",
     )

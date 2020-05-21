@@ -35,5 +35,5 @@ class LinkInvoiceLineExpenseWizard(models.TransientModel):
         )
         for expense in expenses:
             expense.write(
-                {"invoice_id": invoice_id, "invoice_line": self.invoice_line_id.id}
+                {"invoice_id": invoice_id, "invoice_line_id": self.invoice_line_id.id}
             )
