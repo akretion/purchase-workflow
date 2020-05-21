@@ -40,6 +40,12 @@ def migrate(env, version):
                 "invoice_line_id",
             ),
             (
+                "purchase.cost.distribution.line.expense",
+                "purchase_cost_distribution_line_expense",
+                "distribution_expense",
+                "expense_id",
+            ),
+            (
                 "import.invoice.line.wizard",
                 "import_invoice_line_wizard",
                 "invoice_line",

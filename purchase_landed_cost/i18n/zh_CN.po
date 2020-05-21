@@ -249,7 +249,7 @@ msgid "Display Name"
 msgstr "显示名称"
 
 #. module: purchase_landed_cost
-#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__distribution_expense
+#: model:ir.model.fields,field_description:purchase_landed_cost.field_purchase_cost_distribution_line_expense__expense_id
 msgid "Distribution expense"
 msgstr "分摊费用"
 

@@ -207,7 +207,7 @@ class PurchaseCostDistribution(models.Model):
                   "distributed because the calculation method "
                   "doesn't provide valid data" % expense.type.name))
         return {
-            'distribution_expense': expense.id,
+            'expense_id': expense.id,
             'expense_amount': line_expense_amount,
             'cost_ratio': line_expense_amount / cost_line.product_qty,
         }
@@ -500,13 +500,13 @@ class PurchaseCostDistributionLineExpense(models.Model):
     picking_date_done = fields.Datetime(
         related="picking_id.date_done", store=True, readonly=True,
     )
-    distribution_expense = fields.Many2one(
+    expense_id = fields.Many2one(
         comodel_name='purchase.cost.distribution.expense',
         string='Distribution expense', ondelete="cascade",
     )
     type = fields.Many2one(
         'purchase.expense.type', string='Expense type', readonly=True,
-        related='distribution_expense.type', store=True,
+        related='expense_id.type', store=True,
     )
     expense_amount = fields.Float(
         string='Expense amount', digits=dp.get_precision('Account'),
