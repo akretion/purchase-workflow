@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Inherit Form view -->
+  <record id="view_purchase_requisition_form" model="ir.ui.view">
+    <field name="name">purchase.requisition.form for Bid selection</field>
+    <field name="model">purchase.requisition</field>
+    <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//button[@name='action_done']" position="before">
+            <button name="action_select_bids" states="open,ongoing" string="Select Bids" type="object" class="btn-primary" />
+        </xpath>
+        <xpath expr="//button[@name='action_done']" position="after">
+            <button name="action_reset" states="done" string="Reset" type="object" />
+        </xpath>
+    </field>
+  </record>
+</odoo>
