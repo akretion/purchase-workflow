@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bid_selection_wizard_view_form" model="ir.ui.view">
+        <field name="name">bid.selection.wizard.form</field>
+        <field name="model">bid.selection.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                      <field name="requisition_id" readonly="1"/>
+                        <field name="selected_line_ids" 
+                               context="{'tree_view_ref': 'purchase_tender_management.purchase_order_line_bid_wizard_tree'}"
+                               readonly="1" />
+                    </group>
+                    <footer>
+                        <button
+                            name="action_confirm_selected_lines"
+                            string="Confirm lines"
+                            type="object"
+                            class="oe_highlight"
+                        />
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
