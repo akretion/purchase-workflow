@@ -10,8 +10,12 @@ class PurchaseRequisition(models.Model):
     def action_select_bids(self):
         self.ensure_one()
 
-        tree_view_id = self.env.ref("purchase_tender_management.purchase_order_line_tree")
-        search_view_id = self.env.ref("purchase_tender_management.purchase_order_line_search")
+        tree_view_id = self.env.ref(
+            "purchase_tender_management.purchase_order_line_tree"
+        )
+        search_view_id = self.env.ref(
+            "purchase_tender_management.purchase_order_line_search"
+        )
 
         return {
             "type": "ir.actions.act_window",
@@ -34,6 +38,13 @@ class PurchaseRequisition(models.Model):
                     po.button_cancel()
                 if po.state == "cancel":
                     po.button_draft()
-                # Reactivate all the order_lines
-                po.order_line.write({"active": True, "bid_selection": "unselected"})
+
+            # Reactivate all the order_lines
+            line_ids = self.env["purchase.order.line"].search(
+                [
+                    ("order_id.requisition_id", "=", req.id),
+                    ("active", "in", [True, False]),
+                ]
+            )
+            line_ids.write({"active": True, "bid_selection": "unselected"})
         self.write({"state": "open"})
