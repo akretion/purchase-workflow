@@ -10,6 +10,8 @@ class PurchaseOrderLine(models.Model):
     # Technical field in order to hide unwanted order_line
     active = fields.Boolean(default=True)
 
+    is_lowest_price_line = fields.Boolean(default=False)
+
     bid_selection = fields.Selection(
         string="Bid Selection",
         selection=[
@@ -44,7 +46,7 @@ class PurchaseOrderLine(models.Model):
         return {
             "name": _("Confirm Bid Selection"),
             "type": "ir.actions.act_window",
-            "view_id": self.env.ref("purchase_tender_management.bid_selection_wizard_view_form").id,
+            "view_id": self.env.ref("purchase_requisition_selection.bid_selection_wizard_view_form").id,
             "view_mode": "form",
             "res_model": "bid.selection.wizard",
             "target": "new",
