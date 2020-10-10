@@ -61,7 +61,7 @@ class BidSelectionWizard(models.TransientModel):
 
         return {
             "type": "ir.actions.act_window",
-            "view_id": self.env.ref("purchase_tender_management.view_purchase_requisition_form").id,
+            "view_id": self.env.ref("purchase_requisition_selection.view_purchase_requisition_form").id,
             "view_mode": "form",
             "res_model": "purchase.requisition",
             "res_id": self.requisition_id.id,

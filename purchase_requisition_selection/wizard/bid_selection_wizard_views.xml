@@ -9,7 +9,7 @@
                     <group>
                       <field name="requisition_id" readonly="1"/>
                         <field name="selected_line_ids" 
-                               context="{'tree_view_ref': 'purchase_tender_management.purchase_order_line_bid_wizard_tree'}"
+                               context="{'tree_view_ref': 'purchase_requisition_selection.purchase_order_line_bid_wizard_tree'}"
                                readonly="1" />
                     </group>
                     <footer>
