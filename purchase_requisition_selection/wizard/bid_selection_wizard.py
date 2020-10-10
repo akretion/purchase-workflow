@@ -59,9 +59,10 @@ class BidSelectionWizard(models.TransientModel):
         # 3. Close Purchase Agreement and back to purchase.requisition form view
         self.requisition_id.action_done()
 
+        req_form_xmlid = "purchase_requisition_selection.view_purchase_requisition_form"
         return {
             "type": "ir.actions.act_window",
-            "view_id": self.env.ref("purchase_requisition_selection.view_purchase_requisition_form").id,
+            "view_id": self.env.ref(req_form_xmlid).id,
             "view_mode": "form",
             "res_model": "purchase.requisition",
             "res_id": self.requisition_id.id,
