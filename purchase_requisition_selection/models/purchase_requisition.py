@@ -9,7 +9,7 @@ class PurchaseRequisition(models.Model):
 
     def _detect_lowest_price_line(self):
         """For each product, set `is_lowest_price_line` to True for the order_line with
-        the lowest price_unit"""
+        the lowest (not null) price_unit"""
         line_ids = self.env["purchase.order.line"].search(
             [
                 ("order_id", "in", self.purchase_ids.ids),
@@ -19,10 +19,16 @@ class PurchaseRequisition(models.Model):
         product_ids = line_ids.mapped("product_id")
 
         for prod in product_ids:
-            prod_line_ids = line_ids.filtered(lambda l: l.product_id == prod)
+            prod_line_ids = line_ids.filtered(
+                lambda l: l.product_id == prod and l.price_unit > 0
+            )
+            sorted_prod_line_ids = prod_line_ids.sorted(key=lambda l: l.price_unit)
 
-            lowest_price_line_id = prod_line_ids.sorted(key=lambda l: l.price_unit)[0]
-            lowest_price_line_id.is_lowest_price_line = True
+            if sorted_prod_line_ids:
+                lowest_price_line_id = sorted_prod_line_ids[0]
+                lowest_price_line_id.is_lowest_price_line = True
+            else:
+                lowest_price_line_id = self.env["purchase.order.line"]
 
             other_line_ids = prod_line_ids - lowest_price_line_id
             other_line_ids.write({"is_lowest_price_line": False})
