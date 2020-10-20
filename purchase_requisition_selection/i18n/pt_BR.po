@@ -1,0 +1,172 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* purchase_requisition_selection
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-20 18:03+0000\n"
+"PO-Revision-Date: 2020-10-20 18:03+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_purchase_order_line__active
+msgid "Active"
+msgstr "Ativo"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__line_ids
+msgid "All the Purchase Requisition lines"
+msgstr "Todas as linhas do Acordo de Compra"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.purchase_order_line_bid_selection_view_tree
+msgid "Bid"
+msgstr "Proposta"
+
+#. module: purchase_requisition_selection
+#: code:addons/purchase_requisition_selection/models/purchase_requisition.py:49
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_purchase_order_line__bid_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.purchase_order_line_search
+#, python-format
+msgid "Bid Selection"
+msgstr "Seleção de Propostas"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.bid_selection_wizard_view_form
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: purchase_requisition_selection
+#: code:addons/purchase_requisition_selection/models/purchase.py:47
+#: model:ir.actions.server,name:purchase_requisition_selection.action_confirm_bid_selection
+#: model:ir.model,name:purchase_requisition_selection.model_bid_selection_wizard
+#, python-format
+msgid "Confirm Bid Selection"
+msgstr "Confirmar a seleção de Propostas"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.bid_selection_wizard_view_form
+msgid "Confirm lines"
+msgstr "Confirmar linhas"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__create_uid
+msgid "Created by"
+msgstr "Criado por"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__create_date
+msgid "Created on"
+msgstr "Criado em"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__display_name
+msgid "Display Name"
+msgstr "Nome exibido"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_purchase_order_line__is_lowest_price_line
+msgid "Is Lowest Price Line"
+msgstr "É a linha com preço mais baixo"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard____last_update
+msgid "Last Modified on"
+msgstr "Última modificação em"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Última atualização por"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__write_date
+msgid "Last Updated on"
+msgstr "Última atualização em"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__requisition_id
+msgid "Purchase Agreement"
+msgstr "Acordo de Compra"
+
+#. module: purchase_requisition_selection
+#: model:ir.model,name:purchase_requisition_selection.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "Linha de Pedido de Compra"
+
+#. module: purchase_requisition_selection
+#: model:ir.model,name:purchase_requisition_selection.model_purchase_requisition
+msgid "Purchase Requisition"
+msgstr "Requisição de Compras"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.purchase_order_line_bid_selection_view_tree
+msgid "Reject"
+msgstr "Rejeitar"
+
+#. module: purchase_requisition_selection
+#: selection:purchase.order.line,bid_selection:0
+msgid "Rejected"
+msgstr "Rejeitado"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,help:purchase_requisition_selection.field_bid_selection_wizard__requisition_id
+msgid "Related Purchase agreement to this Bid Selection"
+msgstr "Acordo de Compra relacionado a essa Seleção de Propostas"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.view_purchase_requisition_form
+msgid "Reset"
+msgstr "Repor"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.purchase_order_line_bid_selection_view_tree
+msgid "Select"
+msgstr "Selecionar"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.view_purchase_requisition_form
+msgid "Select Bids"
+msgstr "Selecionar Propostas"
+
+#. module: purchase_requisition_selection
+#: selection:purchase.order.line,bid_selection:0
+msgid "Selected"
+msgstr "Selecionado"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,field_description:purchase_requisition_selection.field_bid_selection_wizard__selected_line_ids
+msgid "Selected lines"
+msgstr "Linhas selecionadas"
+
+#. module: purchase_requisition_selection
+#: model:ir.model.fields,help:purchase_requisition_selection.field_bid_selection_wizard__selected_line_ids
+msgid "Selected purchase order lines"
+msgstr "Linhas de ordem de compra selecionadas"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.purchase_order_line_bid_wizard_tree
+msgid "Total"
+msgstr ""
+
+#. module: purchase_requisition_selection
+#: selection:purchase.order.line,bid_selection:0
+msgid "Unselected"
+msgstr "Não selecionado"
+
+#. module: purchase_requisition_selection
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_selection.bid_selection_wizard_view_form
+msgid "or"
+msgstr "ou"
