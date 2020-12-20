@@ -289,6 +289,15 @@ class OrderResponseImport(models.TransientModel):
                 )
             )
             return
+        self._process_conditional_with_or_without_moves(purchase_order, lines)
+
+    @api.model
+    def _process_conditional_with_or_without_moves(self, purchase_order, lines):
+        """
+        This method updates stock.move because diff
+        between purchase order and its response is only defined in moves
+        For another workflow, override this method
+        """
         purchase_order.signal_workflow("purchase_confirm")
         # apply changes to the created moves...
         lines_by_id = {int(l["line_id"]): l for l in lines}
