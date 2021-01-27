@@ -59,13 +59,14 @@ class Test(common.SavepointCase):
 
     def test_proposal_workflow(self):
         # order with supplier
+        order = self.get_order_with_user()
+        order.partner_id.write({"check_price_on_proposal": True})
         order_s = self.get_order_with_user(alternate_user=True)
         order_s.order_line[0].button_update_proposal()
         prop = order_s.proposal_ids[0]
         prop.write({"qty": 10, "price_u": 2})
         order_s.submit_proposal()
         assert order_s.proposal_updatable == "yes"
-        order = self.get_order_with_user()
         assert order.proposal_state == "submitted"
         order.approve_proposal()
         # We check all is correctly written

@@ -129,7 +129,7 @@ class PurchaseOrder(models.Model):
         """
         if initial_state in ("approved", "confirmed"):
             self.signal_workflow("purchase_confirm")
-            self.signal_workflow("purchase_approved")
+            self.signal_workflow("purchase_approve")
 
     def _prepare_proposal_data(self):
         self.ensure_one()
@@ -144,14 +144,13 @@ class PurchaseOrder(models.Model):
                 # we already have a purchase_line as origin of these data
                 # then we'll create a new line
                 vals["order_id"] = elm.order_id.id
-                vals["price_unit"] = elm.price_u or elm.line_id.price_unit
                 vals["date_planned"] = elm.date or elm.line_id.date_planned
                 vals["product_id"] = elm.line_id.product_id.id
                 vals["name"] = elm.line_id.product_id.display_name
-                vals["proposal"] = elm
+                vals["price_unit"] = elm.price_u or elm.line_id.price_unit
             else:
                 # it'll be used for write
-                if elm.price_u:
+                if elm.price_u and self.partner_id.check_price_on_proposal:
                     vals["price_unit"] = elm.price_u
                 if elm.date:
                     vals["date_planned"] = elm.date

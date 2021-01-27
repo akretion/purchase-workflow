@@ -41,6 +41,9 @@ class PurchaseLineProposal(models.Model):
     price_u = fields.Float(
         string="New Price U.", digits_compute=dp.get_precision("Product Price")
     )
+    check_price_on_proposal = fields.Boolean(
+        related="order_id.partner_id.check_price_on_proposal", store=False,
+    )
 
     def _compute_line_id(self):
         for rec in self:
