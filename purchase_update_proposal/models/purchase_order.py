@@ -174,8 +174,13 @@ class PurchaseOrder(models.Model):
                 todo = len(data[line_id]) - 1
                 while todo:
                     # create other lines if any
-                    self.env["purchase.order.line"].create(data[line_id][todo])
-                    body.append(_("Created line: %s" % data[line_id][todo]))
+                    vals = data[line_id][todo]
+                    new_vals = {}
+                    for elm in ["date_planned", "price_unit", "product_qty"]:
+                        if elm in vals:
+                            new_vals.update({elm: vals[elm]})
+                    line_id.copy(new_vals)
+                    body.append(_("Created line: %s" % vals))
                     todo -= 1
 
     @api.multi

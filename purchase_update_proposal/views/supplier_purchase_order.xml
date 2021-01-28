@@ -103,7 +103,7 @@
                                         We can't complete your request because our incoming workflow is partially finished or cancelled
                                     </div>
                                 </group>
-                                <group colspan="4" attrs="{'invisible': [('proposal_count', '&lt;', 2)]}">
+                                <group colspan="4" attrs="{'invisible': [('proposal_count', '&lt;', 1)]}">
                                     <field name="proposal_date"/>
                                 </group>
                                 <hr style="background: AntiqueWhite; height: 12px" colspan="4"/>

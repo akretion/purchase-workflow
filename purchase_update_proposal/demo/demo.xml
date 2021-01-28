@@ -28,6 +28,12 @@
                eval="[(4, ref('group_supplier_own_purchase')), (4, ref('group_purchase_proposal_user'))]"/>
     </record>
 
+    <record id="tax17" model="account.tax">
+        <field name="name">17</field>
+        <field name="amount">17</field>
+        <field name="type">percent</field>
+    </record>
+
     <record id="purchase_order" model="purchase.order">
         <field name="name">Purchase Order for supplier</field>
         <field name="partner_id" ref="purchase_update_proposal.supplier_demo_partner"/>
@@ -40,6 +46,7 @@
                 'name': 'DVD RW',
                 'price_unit': 22.80,
                 'product_qty': 15.0,
+                'taxes_id': [(6, 0, [ref('tax17')])],
                 'product_uom': ref('product.product_uom_unit'),
                 'date_planned': DateTime.today() + relativedelta(days=3)}),
             (0, 0, {
@@ -47,6 +54,7 @@
                 'name': 'Ipod',
                 'price_unit': 19.50,
                 'product_qty': 5.0,
+                'taxes_id': [(6, 0, [ref('tax17')])],
                 'product_uom': ref('product.product_uom_unit'),
                 'date_planned': DateTime.today() + relativedelta(days=3)}),
         ]"/>
