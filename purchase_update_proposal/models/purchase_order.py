@@ -116,9 +116,6 @@ class PurchaseOrder(models.Model):
             self.action_cancel_draft()
         if data:
             self._update_proposal_to_purchase_line(data, body)
-            self.env["purchase.line.proposal"].search(
-                [("order_id", "=", self.id)]
-            ).unlink()
         self.write({"proposal_state": "approved"})
         self.message_post(body="\n".join(body))
         self._post_process_approved_proposal(initial_state)
@@ -130,6 +127,8 @@ class PurchaseOrder(models.Model):
         if initial_state in ("approved", "confirmed"):
             self.signal_workflow("purchase_confirm")
             self.signal_workflow("purchase_approve")
+        # clean accepted proposals
+        self.env["purchase.line.proposal"].search([("order_id", "=", self.id)]).unlink()
 
     def _prepare_proposal_data(self):
         self.ensure_one()
