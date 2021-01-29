@@ -41,6 +41,8 @@ class PurchaseOrder(models.Model):
         help="Update all date of the order with this date",
         copy=False,
     )
+    check_price_on_proposal = fields.Boolean(
+        related="partner_id.check_price_on_proposal")
 
     def _check_updatable_proposal(self):
         self = self.sudo()
@@ -67,6 +69,7 @@ class PurchaseOrder(models.Model):
         lines = self.order_line.filtered(
             lambda s: s.id not in self.proposal_ids.mapped("line_id").ids
         )
+        self.write({"proposal_date": False})
         lines.button_update_proposal()
 
     @api.onchange("proposal_date")
@@ -141,12 +144,12 @@ class PurchaseOrder(models.Model):
             vals = {"product_qty": elm.qty}
             if elm.line_id in res:
                 # we already have a purchase_line as origin of these data
-                # then we'll create a new line
-                vals["order_id"] = elm.order_id.id
+                # then we'll create a new line by copy
                 vals["date_planned"] = elm.date or elm.line_id.date_planned
-                vals["product_id"] = elm.line_id.product_id.id
-                vals["name"] = elm.line_id.product_id.display_name
-                vals["price_unit"] = elm.price_u or elm.line_id.price_unit
+                if elm.price_u and self.partner_id.check_price_on_proposal:
+                    vals["price_unit"] = elm.price_u or elm.line_id.price_unit
+                else:
+                    vals["price_unit"] = elm.line_id.price_unit
             else:
                 # it'll be used for write
                 if elm.price_u and self.partner_id.check_price_on_proposal:
@@ -203,7 +206,6 @@ class PurchaseOrder(models.Model):
         ]
 
     def _fields_prevent_to_update(self, vals):
-        res = False
         if [x for x in vals.keys() if x[:9] != "proposal_"]:
-            res = True
-        return res
+            return True
+        return False

@@ -97,6 +97,8 @@
                                     <div attrs="{'invisible': [('proposal_state', '!=', 'draft')]}">Update new fields below and submit modifications.</div>
                                     <div attrs="{'invisible': [('proposal_state', '!=', 'submitted')]}">These data have to be approved before update purchase line</div>
                                     <field name="proposal_ids" colspan="4" attrs="{'readonly': [('proposal_updatable', '=', 'no')]}" nolabel="1"/>
+                                    <div attrs="{'invisible': [('check_price_on_proposal', '=', True)]}" colspan="2" style="text-align:center;">Prices are not updated for this supplier</div>
+                                    <field name="check_price_on_proposal" invisible="1"/>
                                     <field name="proposal_updatable" invisible="1"/>
                                     <div attrs="{'invisible': [('proposal_updatable', '!=', 'no')]}" colspan="2"
                                          style="background-color:red; color:white; text-align:center; font-weight: bold;">
