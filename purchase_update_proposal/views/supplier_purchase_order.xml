@@ -53,8 +53,9 @@
         <field name="arch" type="xml">
             <form string="Purchase Order" create="0" edit="1">
             <header>
-                <button name="populate_all_purchase_lines" help="Update dates" 
-                    type="object" string="Update all dates" groups="purchase_update_proposal.group_purchase_proposal_user"/>
+                <button name="populate_all_purchase_lines" type="object" string="Update all dates"
+                    help="Display a date field which update dates all lines" 
+                    groups="purchase_update_proposal.group_purchase_proposal_user,purchase_update_proposal.group_supplier_own_purchase"/>
                 <button name="purchase_supplier_confirm" type="object" states="confirmed" string="Approve Order" class="oe_highlight"/>
                 <field name="state" widget="statusbar" statusbar_visible="confirmed,approved,done" statusbar_colors='{"except_picking":"red","except_invoice":"red","confirmed":"blue"}' readonly="1"/>
             </header>
