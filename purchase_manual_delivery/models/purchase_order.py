@@ -39,7 +39,7 @@ class PurchaseOrderLine(models.Model):
         string="Existing Qty",
         compute_sudo=True,
         digits=dp.get_precision("Product Unit of Measure"),
-        help="Quantity already planned or shipped (stock movements already created)",
+        help="Quantity already planned or shipped " "(stock movements already created)",
     )
     pending_to_receive = fields.Boolean(
         compute="_compute_existing_qty",

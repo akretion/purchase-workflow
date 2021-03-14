@@ -119,6 +119,9 @@ class CreateManualStockPickingWizard(models.TransientModel):
             res["location_dest_id"] = self.location_dest_id.id
         return res
 
+    def _create_stock_moves(self, picking_id):
+        return self.line_ids._create_stock_moves(picking_id)
+
     def create_stock_picking(self):
         StockPicking = self.env["stock.picking"]
 
@@ -138,7 +141,7 @@ class CreateManualStockPickingWizard(models.TransientModel):
                     "the purchase order first."
                 )
             )
-        moves = self.line_ids._create_stock_moves(picking_id)
+        moves = self._create_stock_moves(picking_id)
         moves = moves.filtered(
             lambda x: x.state not in ("done", "cancel")
         )._action_confirm()
