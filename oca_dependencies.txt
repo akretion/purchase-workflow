@@ -1,2 +1,3 @@
 server-ux
 product-attribute
+purchase-workflow https://github.com/ForgeFlow/purchase-workflow.git 13.0-purchase_schedule_line
