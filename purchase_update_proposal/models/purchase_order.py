@@ -211,3 +211,26 @@ class PurchaseOrder(models.Model):
         if [x for x in vals.keys() if x[:9] != "proposal_"]:
             return True
         return False
+
+    @api.multi
+    def wkf_confirm_order(self):
+        for rec in self:
+            rec._subscribe_portal_vendor()
+        return super(PurchaseOrder, self).wkf_confirm_order()
+
+    @api.multi
+    def _subscribe_portal_vendor(self):
+        self.ensure_one()
+        cial_partner = self.partner_id.commercial_partner_id
+        partner_ids = cial_partner.child_ids.ids
+        partner_ids.append(cial_partner.id)
+        users = self.env["res.users"].search([("partner_id", "in", partner_ids)])
+        if users:
+            users = users.filtered(
+                lambda s: self.env.ref(
+                    "purchase_update_proposal.group_supplier_own_purchase"
+                )
+                in s.groups_id
+            )
+            if users:
+                self.message_subscribe_users(users.ids)
