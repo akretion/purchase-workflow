@@ -119,6 +119,7 @@ class PurchaseOrder(models.Model):
         data = self._prepare_proposal_data()
         initial_state = self.state
         if initial_state in ["confirmed", "approved"]:
+            self._hook_for_cancel_process()
             self.action_cancel()
             self.action_cancel_draft()
         if data:
@@ -126,6 +127,14 @@ class PurchaseOrder(models.Model):
         self.write({"proposal_state": "approved"})
         self.message_post(body="\n".join(body))
         self._post_process_approved_proposal(initial_state)
+
+    def _hook_for_cancel_process(self):
+        """Cancellation here is a fake one, in fact it's a workaround
+        to cleanly update purchase when picking has been created.
+        Context can't be used because it disappears in the global odoo process
+        So you may make changes in your custom process to capture falsy cancellation
+        """
+        return
 
     def _post_process_approved_proposal(self, initial_state):
         """Customize according to your needs according delegation
