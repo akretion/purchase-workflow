@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 
-from openerp import fields, models
+from openerp import fields, models, api
 import openerp.addons.decimal_precision as dp
 
 
@@ -36,7 +36,8 @@ class PurchaseLineProposal(models.Model):
         string="Old Date", related="line_id.date_planned", readonly=True
     )
     qty = fields.Float(
-        string="New Qty", digits_compute=dp.get_precision("Product Unit of Measure")
+        string="New Qty",
+        digits_compute=dp.get_precision("Product Unit of Measure"),
     )
     date = fields.Date(string="New Date")
     price_u = fields.Float(

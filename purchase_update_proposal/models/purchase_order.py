@@ -45,7 +45,8 @@ class PurchaseOrder(models.Model):
         related="partner_id.check_price_on_proposal"
     )
     proposal_display = fields.Boolean(
-        string="Display/Hide Proposal", help="If checked, rejected proposal are hidden."
+        string="Display/Hide Proposal",
+        help="If checked, rejected proposal are hidden.",
     )
 
     def _check_updatable_proposal(self):
@@ -79,7 +80,9 @@ class PurchaseOrder(models.Model):
     @api.onchange("proposal_date")
     def onchange_proposal_date(self):
         for rec in self:
-            vals = [(1, x.id, {"date": rec.proposal_date}) for x in rec.proposal_ids]
+            vals = [
+                (1, x.id, {"date": rec.proposal_date}) for x in rec.proposal_ids
+            ]
             rec.proposal_ids = vals
 
     @api.multi
@@ -124,6 +127,8 @@ class PurchaseOrder(models.Model):
             self.action_cancel_draft()
         if data:
             self._update_proposal_to_purchase_line(data, body)
+        null_proposals = self.proposal_ids.filtered(lambda s: s.qty == 0)
+        null_proposals.mapped("line_id").action_cancel()
         self.write({"proposal_state": "approved"})
         self.message_post(body="\n".join(body))
         self._post_process_approved_proposal(initial_state)
@@ -144,12 +149,17 @@ class PurchaseOrder(models.Model):
             self.signal_workflow("purchase_confirm")
             self.signal_workflow("purchase_approve")
         # clean accepted proposals
-        self.env["purchase.line.proposal"].search([("order_id", "=", self.id)]).unlink()
+        self.env["purchase.line.proposal"].search(
+            [("order_id", "=", self.id)]
+        ).unlink()
 
     def _prepare_proposal_data(self):
         self.ensure_one()
         res = defaultdict(list)
         for elm in self.proposal_ids:
+            # If new quantity is null, we don't update the purchaseline fields.
+            if elm.qty == 0.0:
+                continue
             vals = {"product_qty": elm.qty}
             if elm.line_id in res:
                 # we already have a purchase_line as origin of these data
@@ -175,13 +185,17 @@ class PurchaseOrder(models.Model):
     def _check_data2update(self, data):
         for key, val in data.items():
             if isinstance(val, list) and not val[0]:
-                raise UserError(_("No data to update for line ID '%s'") % key.id)
+                raise UserError(
+                    _("No data to update for line ID '%s'") % key.id
+                )
 
     def _update_proposal_to_purchase_line(self, data, body):
         for line_id in data:
             # we update first line
             line_id.write(data[line_id][0])
-            body.append(_("Updated line '%s' with %s") % (line_id.id, data[line_id][0]))
+            body.append(
+                _("Updated line '%s' with %s") % (line_id.id, data[line_id][0])
+            )
             if len(data[line_id]) > 1:
                 todo = len(data[line_id]) - 1
                 while todo:
@@ -197,7 +211,9 @@ class PurchaseOrder(models.Model):
 
     @api.multi
     def write(self, vals):
-        if not self._get_purchase_groups() and self._fields_prevent_to_update(vals):
+        if not self._get_purchase_groups() and self._fields_prevent_to_update(
+            vals
+        ):
             # The user is not an Odoo purchaser, we must prevent to update other fields
             logger.info("Fields being written %s" % vals.keys())
             raise UserError(
@@ -233,7 +249,9 @@ class PurchaseOrder(models.Model):
         cial_partner = self.partner_id.commercial_partner_id
         partner_ids = cial_partner.child_ids.ids
         partner_ids.append(cial_partner.id)
-        users = self.env["res.users"].search([("partner_id", "in", partner_ids)])
+        users = self.env["res.users"].search(
+            [("partner_id", "in", partner_ids)]
+        )
         if users:
             users = users.filtered(
                 lambda s: self.env.ref(
