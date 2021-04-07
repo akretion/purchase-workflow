@@ -124,6 +124,11 @@ class PurchaseOrder(models.Model):
             self.action_cancel_draft()
         if data:
             self._update_proposal_to_purchase_line(data, body)
+        # Cancellation cases
+        null_proposals = self.proposal_ids.filtered(lambda s: s.qty == 0.0)
+        null_proposals.mapped("line_id").action_cancel()
+        if sum([x.qty for x in self.proposal_ids]) == 0.0:
+            self.action_cancel()
         self.write({"proposal_state": "approved"})
         self.message_post(body="\n".join(body))
         self._post_process_approved_proposal(initial_state)
@@ -150,6 +155,9 @@ class PurchaseOrder(models.Model):
         self.ensure_one()
         res = defaultdict(list)
         for elm in self.proposal_ids:
+            # If new quantity is null, we don't update the purchaseline fields.
+            if elm.qty == 0.0:
+                continue
             vals = {"product_qty": elm.qty}
             if elm.line_id in res:
                 # we already have a purchase_line as origin of these data
