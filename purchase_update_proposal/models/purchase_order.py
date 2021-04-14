@@ -129,9 +129,9 @@ class PurchaseOrder(models.Model):
         null_proposals.mapped("line_id").action_cancel()
         if sum([x.qty for x in self.proposal_ids]) == 0.0:
             self.action_cancel()
-        self.write({"proposal_state": "approved"})
         self.message_post(body="\n".join(body))
         self._post_process_approved_proposal(initial_state)
+        self.write({"proposal_state": "approved"})
 
     def _hook_for_cancel_process(self):
         """Cancellation here is a fake one, in fact it's a workaround
