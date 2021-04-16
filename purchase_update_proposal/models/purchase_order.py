@@ -127,8 +127,6 @@ class PurchaseOrder(models.Model):
         # Cancellation cases
         null_proposals = self.proposal_ids.filtered(lambda s: s.qty == 0.0)
         null_proposals.mapped("line_id").action_cancel()
-        if sum([x.qty for x in self.proposal_ids]) == 0.0:
-            self.action_cancel()
         self.message_post(body="\n".join(body))
         self._post_process_approved_proposal(initial_state)
         self.write({"proposal_state": "approved"})
