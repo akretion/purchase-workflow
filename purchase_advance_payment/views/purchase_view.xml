@@ -11,7 +11,7 @@
                     string="Pay purchase advanced"
                     type="action"
                     groups="account.group_account_invoice"
-                    attrs="{'invisible': ['|',('state', 'in', ['done','cancel']),('amount_residual', '=', 0)]}"
+                    attrs="{'invisible': ['|',('state', 'in', ['done','cancel']),('invoice_status', 'in', ['invoiced'])]}"
                 />
             </button>
             <notebook position="inside">
@@ -65,32 +65,4 @@
             </field>
         </field>
     </record>
-
-    <record id="purchase_order_kpis_tree" model="ir.ui.view">
-        <field name="name">purchase.order.inherit.purchase.order.tree</field>
-        <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree" />
-        <field name="arch" type="xml">
-            <field name="invoice_status" position="before">
-                <field
-                    name="advance_payment_status"
-                    decoration-success="advance_payment_status == 'paid'"
-                    decoration-info="advance_payment_status == 'partial'"
-                    decoration-warning="advance_payment_status == 'not_paid'"
-                    widget="badge"
-                    optional="hide"
-                />
-            </field>
-            <field name="amount_total" position="after">
-                <field
-                    name="amount_residual"
-                    sum="Amount Residual"
-                    widget="monetary"
-                    decoration-bf="1"
-                    optional="hide"
-                />
-            </field>
-        </field>
-    </record>
-
 </odoo>
