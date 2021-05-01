@@ -58,7 +58,9 @@
         <field name="arch" type="xml">
             <form string="Purchase Order" create="0" edit="1">
             <header>
-                <button name="purchase_supplier_confirm" type="object" states="confirmed" string="Approve Order" class="oe_highlight" attrs="{'invisible': [('proposal_count', '>', 0)]}"/>
+                <button name="purchase_supplier_confirm" type="object"
+                    string="Approve Order" class="oe_highlight oe_read_only"
+                    attrs="{'invisible': ['|', ('proposal_count', '>', 0), ('state', '!=', 'confirmed')]}"/>
                 <field name="state" widget="statusbar" statusbar_visible="confirmed,approved,done" statusbar_colors='{"except_picking":"red","except_invoice":"red","confirmed":"blue"}' readonly="1"/>
             </header>
             <sheet>
