@@ -3,7 +3,7 @@
 {
     "name": "Purchase Order Line Schedule Stock",
     "summary": "Integrates purchase_stock with purchase_order_line_schedule ",
-    "version": "13.0.1.0.1",
+    "version": "14.0.1.0.1",
     "category": "Purchase",
     "website": "https://github.com/OCA/purchase-workflow",
     "author": "ForgeFlow, Odoo Community Association (OCA)",
