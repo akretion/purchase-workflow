@@ -75,9 +75,9 @@ class TestPurchaseManualDelivery(TransactionCase):
 
     def test_01_purchase_order_manual_delivery(self):
         """
-            Confirm Purchase Order 1, check no incoming shipments have been
-            pre-created, create them manually (create one with one PO line,
-            add second PO line to same picking afterwards)
+        Confirm Purchase Order 1, check no incoming shipments have been
+        pre-created, create them manually (create one with one PO line,
+        add second PO line to same picking afterwards)
         """
         # confirm RFQ
         self.po1.button_confirm_manual()
@@ -127,7 +127,7 @@ class TestPurchaseManualDelivery(TransactionCase):
         wizard.picking_id = picking_id
         wizard.create_stock_picking()
         self.assertEqual(
-            len(self.po1.picking_ids), 1, "No extra picking should have been created",
+            len(self.po1.picking_ids), 1, "No extra picking should have been created"
         )
         # create a manual delivery, no lines should be proposed
         wizard = (
@@ -150,9 +150,9 @@ class TestPurchaseManualDelivery(TransactionCase):
 
     def test_02_purchase_order_line_manual_delivery(self):
         """
-            Confirm Purchase Order 1 and 2, try to create incoming shipment
-            from two PO lines from different PO (error), create one reception
-            for two PO lines from same PO twice.
+        Confirm Purchase Order 1 and 2, try to create incoming shipment
+        from two PO lines from different PO (error), create one reception
+        for two PO lines from same PO twice.
         """
         # confirm RFQ
         self.po1.button_confirm_manual()
@@ -187,8 +187,8 @@ class TestPurchaseManualDelivery(TransactionCase):
 
     def test_03_purchase_order_line_location(self):
         """
-            Confirm Purchase Order 1, create one reception changing the
-            location, check location has been correctly set in Picking.
+        Confirm Purchase Order 1, create one reception changing the
+        location, check location has been correctly set in Picking.
         """
         grp_multi_loc = self.env.ref("stock.group_stock_multi_locations")
         self.env.user.write({"groups_id": [(4, grp_multi_loc.id, 0)]})
