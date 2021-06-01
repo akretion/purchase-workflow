@@ -3,7 +3,7 @@
 {
     "name": "Purchase Order Line Schedule",
     "summary": "Add shedule lines in purchase order lines",
-    "version": "13.0.1.0.1",
+    "version": "14.0.1.0.0",
     "category": "Purchase",
     "website": "https://github.com/OCA/purchase-workflow",
     "author": "ForgeFlow, Odoo Community Association (OCA)",

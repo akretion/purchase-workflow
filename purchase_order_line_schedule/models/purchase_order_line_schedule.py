@@ -14,8 +14,8 @@ class PurchaseOrderLineSchedule(models.Model):
     order_id = fields.Many2one(
         comodel_name="purchase.order", related="order_line_id.order_id", store=True
     )
-    purchase_state = fields.Selection(related="order_line_id.order_id.state",)
-    qty_received_method = fields.Selection(related="order_line_id.qty_received_method",)
+    purchase_state = fields.Selection(related="order_line_id.order_id.state")
+    qty_received_method = fields.Selection(related="order_line_id.qty_received_method")
     order_line_id = fields.Many2one(
         comodel_name="purchase.order.line", required=True, ondelete="cascade"
     )
@@ -40,7 +40,9 @@ class PurchaseOrderLineSchedule(models.Model):
         "Manual Received Qty", digits="Product Unit of Measure", copy=False
     )
     product_id = fields.Many2one(
-        comodel_name="product.product", related="order_line_id.product_id", store=True,
+        comodel_name="product.product",
+        related="order_line_id.product_id",
+        store=True,
     )
     company_id = fields.Many2one(
         "res.company", related="order_line_id.company_id", store=True

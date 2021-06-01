@@ -74,7 +74,7 @@ class TestPurchaseOrderLineScheduley(TransactionCase):
 
     def test_01_purchase_order_schedule(self):
         """
-            Create a schedule for a PO line
+        Create a schedule for a PO line
         """
         # confirm RFQ
         # Check that we have a schedule line by default

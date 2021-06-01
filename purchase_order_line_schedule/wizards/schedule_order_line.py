@@ -8,9 +8,11 @@ class ScheduleOrderLine(models.TransientModel):
     _name = "schedule.order.line"
     _description = "Wizard To Schedule Order Lines for a Purchase Order Line"
 
-    order_line_id = fields.Many2one(comodel_name="purchase.order.line", required=True,)
+    order_line_id = fields.Many2one(comodel_name="purchase.order.line", required=True)
     item_ids = fields.One2many(
-        comodel_name="schedule.order.line.item", inverse_name="wiz_id", string="Items",
+        comodel_name="schedule.order.line.item",
+        inverse_name="wiz_id",
+        string="Items",
     )
 
     def _prepare_item(self, sl):
@@ -63,17 +65,17 @@ class ScheduleOrderLineItem(models.TransientModel):
 
     wiz_id = fields.Many2one("schedule.order.line", required=True, ondelete="cascade")
 
-    order_line_id = fields.Many2one(comodel_name="purchase.order.line",)
+    order_line_id = fields.Many2one(comodel_name="purchase.order.line")
     order_id = fields.Many2one(
         comodel_name="purchase.order", related="order_line_id.order_id"
     )
-    purchase_state = fields.Selection(related="order_line_id.order_id.state",)
+    purchase_state = fields.Selection(related="order_line_id.order_id.state")
     qty_received_method = fields.Selection(related="order_line_id.qty_received_method")
     date_planned = fields.Datetime(string="Scheduled Date")
     product_qty = fields.Float(
         string="Quantity", digits="Product Unit of Measure", required=True
     )
-    qty_received = fields.Float("Received", digits="Product Unit of Measure",)
+    qty_received = fields.Float("Received", digits="Product Unit of Measure")
     qty_to_receive = fields.Float(
         "To Receive",
         compute="_compute_qty_to_receive",
