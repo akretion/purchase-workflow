@@ -46,6 +46,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="date_planned" />
+                <field name="qty_to_receive" />
                 <filter
                     name="to_receive"
                     string="To Receive"

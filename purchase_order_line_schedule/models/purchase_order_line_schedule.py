@@ -35,6 +35,7 @@ class PurchaseOrderLineSchedule(models.Model):
         compute="_compute_qty_to_receive",
         compute_sudo=True,
         digits="Product Unit of Measure",
+        store=True,
     )
     qty_received_manual = fields.Float(
         "Manual Received Qty", digits="Product Unit of Measure", copy=False
