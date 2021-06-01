@@ -114,7 +114,7 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
         related="schedule_line_id.product_qty",
         digits="Product Unit of Measure",
     )
-    existing_qty = fields.Float(related="schedule_line_id.existing_qty",)
+    existing_qty = fields.Float(related="schedule_line_id.existing_qty")
     remaining_qty = fields.Float(
         string="Remaining Quantity",
         compute="_compute_remaining_qty",
@@ -133,7 +133,9 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
         "res.currency", related="purchase_order_line_id.currency_id"
     )
     partner_id = fields.Many2one(
-        "res.partner", related="purchase_order_line_id.partner_id", string="Vendor",
+        "res.partner",
+        related="purchase_order_line_id.partner_id",
+        string="Vendor",
     )
     taxes_id = fields.Many2many(
         "account.tax", related="purchase_order_line_id.taxes_id"

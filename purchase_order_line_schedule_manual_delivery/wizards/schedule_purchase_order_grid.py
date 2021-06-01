@@ -7,7 +7,7 @@ class SchedulePurchaseOrderGrid(models.TransientModel):
     _name = "schedule.purchase.order.grid"
     _description = "Schedule Purchase Order Grid"
 
-    wiz_id = fields.Many2one(comodel_name="schedule.purchase.order",)
+    wiz_id = fields.Many2one(comodel_name="schedule.purchase.order")
     line_ids = fields.Many2many(comodel_name="schedule.grid.line")
 
     @api.onchange("wiz_id")

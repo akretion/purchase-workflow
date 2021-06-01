@@ -78,9 +78,9 @@ class TestPurchaseOrderLineScheduleManualDelivery(TransactionCase):
 
     def test_01_purchase_order_manual_delivery(self):
         """
-            Confirm Purchase Order 1, check no incoming shipments have been
-            pre-created, create them manually (create one with one PO line,
-            add second PO line to same picking afterwards)
+        Confirm Purchase Order 1, check no incoming shipments have been
+        pre-created, create them manually (create one with one PO line,
+        add second PO line to same picking afterwards)
         """
         # confirm RFQ
         self.po1.button_confirm_manual()

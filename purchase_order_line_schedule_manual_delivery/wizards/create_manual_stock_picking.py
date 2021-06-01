@@ -135,7 +135,9 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
         "res.currency", related="purchase_order_line_id.currency_id"
     )
     partner_id = fields.Many2one(
-        "res.partner", related="purchase_order_line_id.partner_id", string="Vendor",
+        "res.partner",
+        related="purchase_order_line_id.partner_id",
+        string="Vendor",
     )
     taxes_id = fields.Many2many(
         "account.tax", related="purchase_order_line_id.taxes_id"

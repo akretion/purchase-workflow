@@ -20,11 +20,11 @@ class ScheduleOrderLineItem(models.TransientModel):
 
     wiz_id = fields.Many2one("schedule.order.line", required=True, ondelete="cascade")
 
-    order_line_id = fields.Many2one(comodel_name="purchase.order.line",)
+    order_line_id = fields.Many2one(comodel_name="purchase.order.line")
     order_id = fields.Many2one(
         comodel_name="purchase.order", related="order_line_id.order_id"
     )
-    purchase_state = fields.Selection(related="order_line_id.order_id.state",)
+    purchase_state = fields.Selection(related="order_line_id.order_id.state")
     qty_received_method = fields.Selection(related="order_line_id.qty_received_method")
     date_planned = fields.Datetime(string="Scheduled Date")
     product_qty = fields.Float(

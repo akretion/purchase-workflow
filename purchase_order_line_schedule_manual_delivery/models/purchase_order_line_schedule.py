@@ -77,7 +77,9 @@ class PurchaseOrderLineSchedule(models.Model):
                     to_allocate -= qty
             for sl in ol.schedule_line_ids:
                 if float_compare(
-                    sl.product_qty, sl.qty_in_receipt, precision_rounding=rounding,
+                    sl.product_qty,
+                    sl.qty_in_receipt,
+                    precision_rounding=rounding,
                 ):
                     sl.pending_to_receive = True
                 else:
