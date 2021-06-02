@@ -17,6 +17,7 @@
         "web_widget_x2many_2d_matrix",  # OCA/web
     ],
     "data": [
+        "security/ir.model.access.csv",
         "wizards/create_manual_stock_picking_views.xml",
         "wizards/schedule_purchase_order_views.xml",
         "wizards/schedule_purchase_order_grid_views.xml",
