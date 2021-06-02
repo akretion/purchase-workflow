@@ -28,7 +28,7 @@ class PurchaseOrderLine(models.Model):
                 for sl in schedule_lines:
                     new_val = val.copy()
                     remaining_qty = sl.product_qty - sl.qty_received
-                    new_val["date_expected"] = sl.date_planned
+                    new_val["date"] = sl.date_planned
                     product_uom_qty, product_uom = po_line_uom._adjust_uom_quantities(
                         remaining_qty, quant_uom
                     )

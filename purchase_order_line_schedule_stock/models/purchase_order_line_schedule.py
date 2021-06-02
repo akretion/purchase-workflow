@@ -17,7 +17,7 @@ class PurchaseOrderLineSchedule(models.Model):
                 sl.qty_received = 0.0
             for move in ol.move_ids.filtered(
                 lambda m: m.product_id == ol.product_id
-            ).sorted(lambda m: m.date_expected):
+            ).sorted(lambda m: m.date):
                 total = 0.0
                 ret_move = move.origin_returned_move_id
                 if move.state == "done":
@@ -51,7 +51,7 @@ class PurchaseOrderLineSchedule(models.Model):
                 # Try to allocate first to the schedule lines that match
                 # exactly in the date
                 for sl in ol.schedule_line_ids.filtered(
-                    lambda l: l.date_planned.date() == move.date_expected.date()
+                    lambda l: l.date_planned.date() == move.date.date()
                 ):
                     qty = min(to_allocate, sl.product_qty - sl.qty_received)
                     sl.qty_received += qty
