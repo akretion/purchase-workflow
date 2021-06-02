@@ -148,7 +148,7 @@ class CreateManualStockPickingWizard(models.TransientModel):
             lambda x: x.state not in ("done", "cancel")
         )._action_confirm()
         seq = 0
-        for move in sorted(moves, key=lambda move: move.date_expected):
+        for move in sorted(moves, key=lambda move: move.date):
             seq += 5
             move.sequence = seq
         moves._action_assign()
