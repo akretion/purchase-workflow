@@ -11,6 +11,11 @@ class AccountVoucherWizardPurchase(models.TransientModel):
     _description = "Account Voucher Wizard Purchase"
 
     order_id = fields.Many2one("purchase.order", required=True)
+    amount_total = fields.Monetary(related="order_id.amount_total")
+    currency_id = fields.Many2one(related="order_id.currency_id")
+    residual_draft = fields.Monetary(related="order_id.residual_draft")
+
+    payment_ref = fields.Char("Ref.")
     journal_id = fields.Many2one(
         "account.journal",
         "Journal",
@@ -24,8 +29,19 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         readonly=False,
         compute="_compute_get_journal_currency",
     )
-    currency_id = fields.Many2one(related="order_id.currency_id")
-    residual_draft = fields.Monetary(related="order_id.residual_draft")
+    compute_advance = fields.Selection(
+        string="Compute Advance",
+        selection=[
+            ("percentage", "Percentage on Order Amount"),
+            ("fixed", "Fixed Amount"),
+            ("balance", "Balance"),
+        ],
+        default="percentage",
+    )
+    percent_advance = fields.Float(
+        string="Advance Percentage",
+        help="Compute Advance amount based on Order total Amount",
+    )
     amount_advance = fields.Monetary(
         "Amount advanced", required=True, currency_field="journal_currency_id"
     )
@@ -33,7 +49,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
     currency_amount = fields.Monetary(
         "Curr. amount", readonly=True, currency_field="currency_id"
     )
-    payment_ref = fields.Char("Ref.")
+
 
     @api.depends("journal_id")
     def _compute_get_journal_currency(self):
@@ -86,6 +102,22 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         else:
             amount_advance = self.amount_advance
         self.currency_amount = amount_advance
+
+    @api.onchange("compute_advance")
+    def _onchange_compute_advance(self):
+        if self.compute_advance == "balance":
+            # TODO : convert in good currency
+            self.amount_advance = self.residual_draft
+        if self.compute_advance != "percentage":
+            self.percent_advance = 0
+        if self.compute_advance == "percentage":
+            self.journal_currency_id = self.currency_id
+
+    @api.onchange("percent_advance")
+    def _onchange_percent_advance(self):
+        if self.percent_advance:
+            # TODO : convert in good currency
+            self.amount_advance = self.amount_total * self.percent_advance / 100
 
     def _prepare_payment_vals(self, purchase):
         partner_id = purchase.partner_id.id

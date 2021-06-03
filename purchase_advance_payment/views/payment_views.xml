@@ -9,7 +9,7 @@
               <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}" />
               <field name="name" readonly="1" />
               <field name="ref" attrs="{'readonly': [('state', '!=', 'draft')]}" />
-              <field name="journal_id" readonly="1" />
+              <field name="journal_id" attrs="{'readonly': [('state', '!=', 'draft')]}" domain="[('type', 'in', ['bank', 'cash'])]"/>
               <field
                     name="amount"
                     sum="Amount"

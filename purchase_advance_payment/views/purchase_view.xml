@@ -27,31 +27,39 @@
                         <group>
                             <!-- I know that it's not a good practice to display the same field twice in the same view,
                             but it seems mandatory to have the residual amounts visible from the payments notebook -->
-                            <field
-                                name="residual_draft"
-                                widget="monetary"
-                                options="{'currency_field': 'currency_id'}"
-                            />
-                            <field
-                                name="residual_posted"
-                                widget="monetary"
-                                options="{'currency_field': 'currency_id'}"
-                            />
+                            <div class="oe_inline text-right">
+                                <label for="residual_draft" />
+                                <span>: </span>
+                                <field
+                                    name="residual_draft"
+                                    widget="monetary"
+                                    options="{'currency_field': 'currency_id'}"
+                                />
+                                <label for="residual_posted" class="ml-3 font-weight-bold"/>
+                                <span>: </span>
+                                <field
+                                    name="residual_posted"
+                                    widget="monetary"
+                                    options="{'currency_field': 'currency_id'}"
+                                    class="font-weight-bold"
+                                />
+                            </div>
                       </group>
                   </group>
                 </page>
             </notebook>
-            <field name="amount_total" position="after">
-                <div>
-                    <label for="residual_draft" />
-                </div>
+
+            <xpath expr="//field[@name='amount_total']" position="attributes">
+                <attribute name="class">mb-3 oe_subtotal_footer_separator</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='amount_total']" position="after">
                 <field
                     name="residual_draft"
-                    nolabel="1"
                     widget="monetary"
                     options="{'currency_field': 'currency_id'}"
                 />
-                <div class="oe_inline oe_subtotal_footer_separator o_td_label">
+                <div class="oe_inline oe_subtotal_footer_separator">
                     <label for="residual_posted" />
                 </div>
                 <field
@@ -61,7 +69,8 @@
                     options="{'currency_field': 'currency_id'}"
                     class="oe_subtotal_footer_separator"
                 />
-            </field>
+            </xpath>
+
         </field>
     </record>
 

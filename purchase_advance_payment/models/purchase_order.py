@@ -15,14 +15,14 @@ class PurchaseOrder(models.Model):
         string="Pay purchase advanced",
     )
     residual_draft = fields.Monetary(
-        "Residual (draft)",
+        "Leftover to allocate",
         readonly=True,
         compute="_compute_purchase_advance_payment",
         store=True,
         currency_field="currency_id",
     )
     residual_posted = fields.Monetary(
-        "Residual (posted)",
+        "Leftover to pay",
         readonly=True,
         compute="_compute_purchase_advance_payment",
         store=True,
