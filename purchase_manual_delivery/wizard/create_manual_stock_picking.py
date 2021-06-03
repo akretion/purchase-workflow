@@ -1,6 +1,8 @@
 # Copyright 2019 ForgeFlow S.L.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from datetime import timedelta
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
@@ -191,7 +193,9 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
         related="purchase_order_line_id.product_uom",
         string="Unit of Measure",
     )
-    date_planned = fields.Datetime(related="purchase_order_line_id.date_planned")
+    date_planned = fields.Datetime(
+        default=lambda l: l.purchase_order_line_id.date_planned
+    )
     product_qty = fields.Float(
         string="Quantity",
         related="purchase_order_line_id.product_qty",
@@ -247,6 +251,10 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
         values = []
         for line in self:
             for val in line._prepare_stock_moves(picking):
+                po_lead = self.env.company.po_lead
+                val["date"] = line.date_planned
+                val["date_deadline"] = line.date_planned + timedelta(days=po_lead)
+
                 if val.get("product_uom_qty", False):
                     val["product_uom_qty"] = line.product_uom._compute_quantity(
                         line.qty, line.product_uom, rounding_method="HALF-UP"
