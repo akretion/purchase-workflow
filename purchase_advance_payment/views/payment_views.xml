@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+  <record id="view_purchase_advance_payment_tree" model="ir.ui.view">
+      <field name="name">account.payment.tree (in purchase_advance_payment)</field>
+      <field name="model">account.payment</field>
+      <field name="arch" type="xml">
+          <tree editable="top" delete="0" create="0">
+              <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+              <field name="name" readonly="1" />
+              <field name="ref" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+              <field name="journal_id" readonly="1" />
+              <field
+                    name="amount"
+                    sum="Amount"
+                    attrs="{'readonly': [('state', '!=', 'draft')]}"
+                />
+              <field
+                    name="currency_id"
+                    groups="base.group_multi_currency"
+                    readonly="1"
+                />
+              <field
+                    name="state"
+                    widget="badge"
+                    decoration-info="state == 'draft'"
+                    decoration-success="state == 'posted'"
+                    class="text-center"
+                />
+              <button
+                    name="action_post"
+                    string="Post"
+                    type="object"
+                    icon="fa-check"
+                    attrs="{'invisible': [('state', '!=', 'draft')]}"
+                />
+              <button
+                    name="unlink"
+                    icon="fa-trash"
+                    type="object"
+                    attrs="{'invisible': [('state', '!=', 'draft')]}"
+                    class="oe_edit_only"
+                />
+              <field name="suitable_journal_ids" invisible="1" />
+              <field name="available_payment_method_ids" invisible="1" />
+          </tree>
+      </field>
+  </record>
+
+</odoo>

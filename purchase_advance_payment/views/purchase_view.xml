@@ -16,24 +16,50 @@
             </button>
             <notebook position="inside">
                 <page string="Payment advances" groups="account.group_account_invoice">
-                    <field
-                        name="account_payment_ids"
-                        nolabel="1"
-                        colspan="4"
-                        context="{'form_view_ref': 'account.view_account_payment_form','tree_view_ref': 'account.view_account_payment_tree'}"
-                    />
+                    <group>
+                        <field
+                            name="account_payment_ids"
+                            nolabel="1"
+                            colspan="4"
+                            context="{'form_view_ref': 'account.view_account_payment_form','tree_view_ref': 'purchase_advance_payment.view_purchase_advance_payment_tree'}"
+                        />
+                        <separator />
+                        <group>
+                            <!-- I know that it's not a good practice to display the same field twice in the same view,
+                            but it seems mandatory to have the residual amounts visible from the payments notebook -->
+                            <field
+                                name="residual_draft"
+                                widget="monetary"
+                                options="{'currency_field': 'currency_id'}"
+                            />
+                            <field
+                                name="residual_posted"
+                                widget="monetary"
+                                options="{'currency_field': 'currency_id'}"
+                            />
+                      </group>
+                  </group>
                 </page>
             </notebook>
             <field name="amount_total" position="after">
-                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                    <label for="amount_residual" />
+                <div>
+                    <label for="residual_draft" />
                 </div>
                 <field
-                    name="amount_residual"
+                    name="residual_draft"
                     nolabel="1"
-                    class="oe_subtotal_footer_separator"
                     widget="monetary"
                     options="{'currency_field': 'currency_id'}"
+                />
+                <div class="oe_inline oe_subtotal_footer_separator o_td_label">
+                    <label for="residual_posted" />
+                </div>
+                <field
+                    name="residual_posted"
+                    nolabel="1"
+                    widget="monetary"
+                    options="{'currency_field': 'currency_id'}"
+                    class="oe_subtotal_footer_separator"
                 />
             </field>
         </field>
@@ -56,7 +82,7 @@
             </field>
             <field name="amount_total" position="after">
                 <field
-                    name="amount_residual"
+                    name="residual_posted"
                     sum="Amount Residual"
                     widget="monetary"
                     decoration-bf="1"

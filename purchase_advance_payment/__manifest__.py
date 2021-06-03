@@ -13,6 +13,7 @@
     "data": [
         "wizard/purchase_advance_payment_wizard_view.xml",
         "views/purchase_view.xml",
+        "views/payment_views.xml",
         "security/ir.model.access.csv",
     ],
     "installable": True,

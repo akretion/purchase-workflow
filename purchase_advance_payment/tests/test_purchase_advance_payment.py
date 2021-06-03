@@ -42,9 +42,18 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
             }
         )
 
+        cls.currency_euro = cls.env["res.currency"].search([("name", "=", "EUR")])
+        cls.currency_usd = cls.env["res.currency"].search([("name", "=", "USD")])
+        cls.currency_rate = cls.env["res.currency.rate"].create(
+            {
+                "rate": 1.20,
+                "currency_id": cls.currency_usd.id,
+            }
+        )
+
         # purchase Order
         cls.purchase_order_1 = cls.env["purchase.order"].create(
-            {"partner_id": cls.res_partner_1.id}
+            {"partner_id": cls.res_partner_1.id, "currency_id": cls.currency_usd.id}
         )
         cls.order_line_1 = cls.env["purchase.order.line"].create(
             {
@@ -74,15 +83,6 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
                 "product_qty": 20.0,
                 "price_unit": 50.0,
                 "taxes_id": cls.tax,
-            }
-        )
-
-        cls.currency_euro = cls.env["res.currency"].search([("name", "=", "EUR")])
-        cls.currency_usd = cls.env["res.currency"].search([("name", "=", "USD")])
-        cls.currency_rate = cls.env["res.currency.rate"].create(
-            {
-                "rate": 1.20,
-                "currency_id": cls.currency_usd.id,
             }
         )
 
@@ -121,13 +121,35 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
             }
         )
 
-    def test_01_purchase_advance_payment(self):
+    def test_post_advance_payment(self):
+        order = self.purchase_order_1
+        context_payment = {"active_ids": [order.id], "active_id": order.id}
+        advance_payment_1 = (
+            self.env["account.voucher.wizard.purchase"]
+            .with_context(context_payment)
+            .create({"journal_id": self.journal_usd_cash.id, "amount_advance": 100})
+        )
+        advance_payment_2 = (
+            self.env["account.voucher.wizard.purchase"]
+            .with_context(context_payment)
+            .create({"journal_id": self.journal_usd_cash.id, "amount_advance": 200})
+        )
+        advance_payment_1.make_advance_payment()
+        advance_payment_2.make_advance_payment()
+        self.assertEqual(order.residual_draft, 3300)
+
+        pay_1 = order.account_payment_ids.filtered(lambda p: p.amount == 100)
+        pay_1.action_post()
+        self.assertEqual(order.residual_posted, 3500)
+        self.assertEqual(order.residual_draft, 3300)
+
+    def test_purchase_advance_payment(self):
         self.assertEqual(
-            self.purchase_order_1.amount_residual,
+            self.purchase_order_1.residual_draft,
             3600,
         )
         self.assertEqual(
-            self.purchase_order_1.amount_residual,
+            self.purchase_order_1.residual_draft,
             self.purchase_order_1.amount_total,
             "Amounts should match",
         )
@@ -167,7 +189,7 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
         )
         advance_payment_1.make_advance_payment()
 
-        self.assertEqual(self.purchase_order_1.amount_residual, 3480)
+        self.assertEqual(self.purchase_order_1.residual_draft, 3480)
 
         # Create Advance Payment 2 - USD - cash
         advance_payment_2 = (
@@ -183,7 +205,7 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
         )
         advance_payment_2.make_advance_payment()
 
-        self.assertEqual(self.purchase_order_1.amount_residual, 3280)
+        self.assertEqual(self.purchase_order_1.residual_draft, 3280)
 
         # Confirm Purchase Order
         self.purchase_order_1.button_confirm()
@@ -201,7 +223,7 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
             )
         )
         advance_payment_3.make_advance_payment()
-        self.assertEqual(self.purchase_order_1.amount_residual, 2980)
+        self.assertEqual(self.purchase_order_1.residual_draft, 2980)
 
         # Create Advance Payment 4 - USD - bank
         advance_payment_4 = (
@@ -216,4 +238,4 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
             )
         )
         advance_payment_4.make_advance_payment()
-        self.assertEqual(self.purchase_order_1.amount_residual, 2580)
+        self.assertEqual(self.purchase_order_1.residual_draft, 2580)

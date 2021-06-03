@@ -24,8 +24,8 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         readonly=False,
         compute="_compute_get_journal_currency",
     )
-    currency_id = fields.Many2one("res.currency", "Currency", readonly=True)
-    amount_total = fields.Monetary("Amount total", readonly=True)
+    currency_id = fields.Many2one(related="order_id.currency_id")
+    residual_draft = fields.Monetary(related="order_id.residual_draft")
     amount_advance = fields.Monetary(
         "Amount advanced", required=True, currency_field="journal_currency_id"
     )
@@ -46,12 +46,12 @@ class AccountVoucherWizardPurchase(models.TransientModel):
     def check_amount(self):
         if self.amount_advance <= 0:
             raise exceptions.ValidationError(_("Amount of advance must be positive."))
-        if self.env.context.get("active_id", False):
+        if self.order_id:
             self.onchange_date()
             if (
                 float_compare(
                     self.currency_amount,
-                    self.order_id.amount_residual,
+                    self.order_id.residual_draft,
                     precision_digits=2,
                 )
                 > 0
@@ -68,14 +68,9 @@ class AccountVoucherWizardPurchase(models.TransientModel):
             return res
         purchase_id = fields.first(purchase_ids)
         purchase = self.env["purchase.order"].browse(purchase_id)
-        if "amount_total" in fields_list:
-            res.update(
-                {
-                    "order_id": purchase.id,
-                    "amount_total": purchase.amount_residual,
-                    "currency_id": purchase.currency_id.id,
-                }
-            )
+
+        if "residual_draft" in fields_list:
+            res.update({"order_id": purchase.id})
 
         return res
 
@@ -111,18 +106,9 @@ class AccountVoucherWizardPurchase(models.TransientModel):
     def make_advance_payment(self):
         """Create customer paylines and validates the payment"""
         self.ensure_one()
-        payment_obj = self.env["account.payment"]
-        purchase_obj = self.env["purchase.order"]
+        if self.order_id:
+            payment_vals = self._prepare_payment_vals(self.order_id)
+            payment = self.env["account.payment"].create(payment_vals)
+            self.order_id.account_payment_ids |= payment
 
-        purchase_ids = self.env.context.get("active_ids", [])
-        if purchase_ids:
-            purchase_id = fields.first(purchase_ids)
-            purchase = purchase_obj.browse(purchase_id)
-            payment_vals = self._prepare_payment_vals(purchase)
-            payment = payment_obj.create(payment_vals)
-            purchase.account_payment_ids |= payment
-            payment.action_post()
-
-        return {
-            "type": "ir.actions.act_window_close",
-        }
+        return {"type": "ir.actions.act_window_close"}
