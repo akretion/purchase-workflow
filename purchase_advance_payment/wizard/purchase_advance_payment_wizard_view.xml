@@ -31,10 +31,10 @@
                                 options="{'currency_field': 'currency_id'}"
                             />
                         </div>
-                        <label for="residual_draft" class="text-muted"/>
+                        <label for="left_to_alloc" class="text-muted"/>
                         <div class="o_row text-muted">
                             <field
-                                name="residual_draft"
+                                name="left_to_alloc"
                                 widget="monetary"
                                 options="{'currency_field': 'currency_id'}"
                             />

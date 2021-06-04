@@ -5,70 +5,42 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form" />
         <field name="arch" type="xml">
-            <button name="button_draft" position="after">
+            <xpath expr="//button[@name='button_draft']" position="after">
                 <button
                     name="%(action_view_account_voucher_wizard)d"
-                    string="Pay purchase advanced"
+                    string="Create Payment"
                     type="action"
                     groups="account.group_account_invoice"
-                    attrs="{'invisible': ['|',('state', 'in', ['done','cancel']),('invoice_status', 'in', ['invoiced'])]}"
+                    attrs="{'invisible': ['|', ('state', 'in', ['done','cancel']), ('is_allocated', '=', True)]}"
                 />
-            </button>
-            <notebook position="inside">
-                <page string="Payment advances" groups="account.group_account_invoice">
-                    <group>
-                        <field
-                            name="account_payment_ids"
-                            nolabel="1"
-                            colspan="4"
-                            context="{'form_view_ref': 'account.view_account_payment_form','tree_view_ref': 'purchase_advance_payment.view_purchase_advance_payment_tree'}"
-                        />
-                        <separator />
-                        <group>
-                            <!-- I know that it's not a good practice to display the same field twice in the same view,
-                            but it seems mandatory to have the residual amounts visible from the payments notebook -->
-                            <div class="oe_inline text-right">
-                                <label for="residual_draft" />
-                                <span>: </span>
-                                <field
-                                    name="residual_draft"
-                                    widget="monetary"
-                                    options="{'currency_field': 'currency_id'}"
-                                />
-                                <label for="residual_posted" class="ml-3 font-weight-bold"/>
-                                <span>: </span>
-                                <field
-                                    name="residual_posted"
-                                    widget="monetary"
-                                    options="{'currency_field': 'currency_id'}"
-                                    class="font-weight-bold"
-                                />
-                            </div>
-                      </group>
-                  </group>
-                </page>
-            </notebook>
-
-            <xpath expr="//field[@name='amount_total']" position="attributes">
-                <attribute name="class">mb-3 oe_subtotal_footer_separator</attribute>
+                <field name="is_allocated" invisible="1" />
             </xpath>
-
-            <xpath expr="//field[@name='amount_total']" position="after">
-                <field
-                    name="residual_draft"
-                    widget="monetary"
-                    options="{'currency_field': 'currency_id'}"
-                />
-                <div class="oe_inline oe_subtotal_footer_separator">
-                    <label for="residual_posted" />
-                </div>
-                <field
-                    name="residual_posted"
-                    nolabel="1"
-                    widget="monetary"
-                    options="{'currency_field': 'currency_id'}"
-                    class="oe_subtotal_footer_separator"
-                />
+            <xpath expr="//page[@name='products']/div[hasclass('oe_clear')]" position="after">
+                <group string="Payments" groups="account.group_account_invoice">
+                    <field
+                        name="account_payment_ids"
+                        nolabel="1"
+                        colspan="4"
+                        context="{'form_view_ref': 'account.view_account_payment_form','tree_view_ref': 'purchase_advance_payment.view_purchase_advance_payment_tree'}"
+                    />
+                    <group class="oe_subtotal_footer oe_right">
+                        <field
+                            name="left_to_alloc"
+                            widget="monetary"
+                            options="{'currency_field': 'currency_id'}"
+                        />
+                        <div class="oe_inline oe_subtotal_footer_separator">
+                            <label for="left_to_pay" />
+                        </div>
+                        <field
+                            name="left_to_pay"
+                            nolabel="1"
+                            widget="monetary"
+                            options="{'currency_field': 'currency_id'}"
+                            class="oe_subtotal_footer_separator"
+                        />
+                    </group>
+                </group>
             </xpath>
 
         </field>
@@ -91,7 +63,7 @@
             </field>
             <field name="amount_total" position="after">
                 <field
-                    name="residual_posted"
+                    name="left_to_pay"
                     sum="Amount Residual"
                     widget="monetary"
                     decoration-bf="1"

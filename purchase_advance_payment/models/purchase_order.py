@@ -13,15 +13,18 @@ class PurchaseOrder(models.Model):
         "account.payment",
         "purchase_id",
         string="Pay purchase advanced",
+        compute="_compute_account_payment_ids",
+        inverse="_inverse_account_payment_ids",
+        store=True,
     )
-    residual_draft = fields.Monetary(
+    left_to_alloc = fields.Monetary(
         "Leftover to allocate",
         readonly=True,
         compute="_compute_purchase_advance_payment",
         store=True,
         currency_field="currency_id",
     )
-    residual_posted = fields.Monetary(
+    left_to_pay = fields.Monetary(
         "Leftover to pay",
         readonly=True,
         compute="_compute_purchase_advance_payment",
@@ -45,6 +48,16 @@ class PurchaseOrder(models.Model):
         readonly=True,
         copy=False,
         tracking=True,
+        compute="_compute_purchase_advance_payment",
+    )
+    is_allocated = fields.Boolean(
+        string="Is allocated",
+        help="True if the Order's payments (draft or posted) equals the Order's "
+        "total amount",
+        store=True,
+        copy=False,
+        tracking=True,
+        default=False,
         compute="_compute_purchase_advance_payment",
     )
 
@@ -85,24 +98,48 @@ class PurchaseOrder(models.Model):
                 elif line.parent_state == "draft":
                     advance_draft += line_amount
 
-            residual_draft = order.amount_total - advance_draft
-            residual_posted = order.amount_total - advance_posted
+            left_to_alloc = order.amount_total - advance_draft
+            left_to_pay = order.amount_total - advance_posted
 
             payment_state = "not_paid"
+            is_allocated = False
             if mls:
-                has_due_amount = float_compare(
-                    residual_posted, 0.0, precision_rounding=order.currency_id.rounding
+                has_amount_to_pay = float_compare(
+                    left_to_pay, 0.0, precision_rounding=order.currency_id.rounding
                 )
-                if has_due_amount <= 0:
+                has_amount_to_allocate = float_compare(
+                    left_to_alloc, 0.0, precision_rounding=order.currency_id.rounding
+                )
+                if has_amount_to_allocate <= 0:
+                    is_allocated = True
+                if has_amount_to_pay <= 0:
                     payment_state = "paid"
-                elif has_due_amount > 0:
+                elif has_amount_to_pay > 0:
                     payment_state = "partial"
 
             order.payment_line_ids = mls
-            order.residual_draft = residual_draft
-            order.residual_posted = residual_posted
+            order.left_to_alloc = left_to_alloc
+            order.left_to_pay = left_to_pay
             order.advance_payment_status = payment_state
+            order.is_allocated = is_allocated
 
-            # TODO : distinguish Residual draft from Residual posted
-            # and add related invoices matched payments to "Residual posted" with :
-            # order.line_ids.matched_debit_ids.debit_move_id.move_id.payment_id
+    @api.depends("invoice_ids.line_ids.matched_debit_ids")
+    def _compute_account_payment_ids(self):
+        """Add payments 'matched with the order's invoices' to the order's payments"""
+        for order in self:
+            matched_ids = order.invoice_ids.line_ids.matched_debit_ids
+            order.account_payment_ids |= matched_ids.debit_move_id.move_id.payment_id
+
+    def _inverse_account_payment_ids(self):
+        for order in self:
+            order.account_payment_ids.write({"purchase_id": order.id})
+
+    def action_create_invoice(self):
+        """Delete order's payments in 'draft' or 'cancel' when creating a new invoice,
+        in order to avoid unused/unuseful draft payments"""
+        res = super().action_create_invoice()
+        for order in self:
+            pay_ids = order.account_payment_ids
+            pay_ids.filtered(lambda p: p.state in ["draft", "cancel"]).unlink()
+
+        return res

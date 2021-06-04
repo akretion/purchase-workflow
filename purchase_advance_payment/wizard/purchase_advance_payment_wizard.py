@@ -13,7 +13,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
     order_id = fields.Many2one("purchase.order", required=True)
     amount_total = fields.Monetary(related="order_id.amount_total")
     currency_id = fields.Many2one(related="order_id.currency_id")
-    residual_draft = fields.Monetary(related="order_id.residual_draft")
+    left_to_alloc = fields.Monetary(related="order_id.left_to_alloc")
 
     payment_ref = fields.Char("Ref.")
     journal_id = fields.Many2one(
@@ -50,7 +50,6 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         "Curr. amount", readonly=True, currency_field="currency_id"
     )
 
-
     @api.depends("journal_id")
     def _compute_get_journal_currency(self):
         for wzd in self:
@@ -67,7 +66,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
             if (
                 float_compare(
                     self.currency_amount,
-                    self.order_id.residual_draft,
+                    self.order_id.left_to_alloc,
                     precision_digits=2,
                 )
                 > 0
@@ -85,7 +84,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         purchase_id = fields.first(purchase_ids)
         purchase = self.env["purchase.order"].browse(purchase_id)
 
-        if "residual_draft" in fields_list:
+        if "left_to_alloc" in fields_list:
             res.update({"order_id": purchase.id})
 
         return res
@@ -107,7 +106,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
     def _onchange_compute_advance(self):
         if self.compute_advance == "balance":
             # TODO : convert in good currency
-            self.amount_advance = self.residual_draft
+            self.amount_advance = self.left_to_alloc
         if self.compute_advance != "percentage":
             self.percent_advance = 0
         if self.compute_advance == "percentage":
@@ -119,28 +118,25 @@ class AccountVoucherWizardPurchase(models.TransientModel):
             # TODO : convert in good currency
             self.amount_advance = self.amount_total * self.percent_advance / 100
 
-    def _prepare_payment_vals(self, purchase):
-        partner_id = purchase.partner_id.id
+    def _prepare_payment_vals(self, order_id):
+        methor_id = self.env.ref("account.account_payment_method_manual_out")
         return {
             "date": self.date,
             "amount": self.amount_advance,
             "payment_type": "outbound",
             "partner_type": "supplier",
-            "ref": self.payment_ref or purchase.name,
+            "ref": self.payment_ref or order_id.name,
             "journal_id": self.journal_id.id,
             "currency_id": self.journal_currency_id.id,
-            "partner_id": partner_id,
-            "payment_method_id": self.env.ref(
-                "account.account_payment_method_manual_out"
-            ).id,
+            "partner_id": order_id.partner_id.id,
+            "payment_method_id": methor_id.id,
+            "purchase_id": order_id.id,
         }
 
     def make_advance_payment(self):
-        """Create customer paylines and validates the payment"""
         self.ensure_one()
         if self.order_id:
             payment_vals = self._prepare_payment_vals(self.order_id)
-            payment = self.env["account.payment"].create(payment_vals)
-            self.order_id.account_payment_ids |= payment
+            self.env["account.payment"].create(payment_vals)
 
         return {"type": "ir.actions.act_window_close"}

@@ -15,11 +15,7 @@
                     sum="Amount"
                     attrs="{'readonly': [('state', '!=', 'draft')]}"
                 />
-              <field
-                    name="currency_id"
-                    groups="base.group_multi_currency"
-                    readonly="1"
-                />
+              <field name="currency_id" invisible="1"/>
               <field
                     name="state"
                     widget="badge"
@@ -38,7 +34,7 @@
                     name="unlink"
                     icon="fa-trash"
                     type="object"
-                    attrs="{'invisible': [('state', '!=', 'draft')]}"
+                    attrs="{'invisible': [('state', 'not in', ['draft', 'cancel'])]}"
                     class="oe_edit_only"
                 />
               <field name="suitable_journal_ids" invisible="1" />
