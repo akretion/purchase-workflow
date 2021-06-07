@@ -21,7 +21,7 @@
                         name="account_payment_ids"
                         nolabel="1"
                         colspan="4"
-                        context="{'form_view_ref': 'account.view_account_payment_form','tree_view_ref': 'purchase_advance_payment.view_purchase_advance_payment_tree'}"
+                        context="{'form_view_ref': 'purchase_advance_payment.view_account_payment_form_no_header','tree_view_ref': 'purchase_advance_payment.view_purchase_advance_payment_tree'}"
                     />
                     <group class="oe_subtotal_footer oe_right">
                         <field

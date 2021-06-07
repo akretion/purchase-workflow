@@ -84,8 +84,11 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         purchase_id = fields.first(purchase_ids)
         purchase = self.env["purchase.order"].browse(purchase_id)
 
+        # Default journal is the first Bank journal
+        bank_id = self.env["account.journal"].search([("type", "=", "bank")], limit=1)
+
         if "left_to_alloc" in fields_list:
-            res.update({"order_id": purchase.id})
+            res.update({"order_id": purchase.id, "journal_id": bank_id.id})
 
         return res
 
@@ -119,7 +122,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
             self.amount_advance = self.amount_total * self.percent_advance / 100
 
     def _prepare_payment_vals(self, order_id):
-        methor_id = self.env.ref("account.account_payment_method_manual_out")
+        method_id = self.env.ref("account.account_payment_method_manual_out")
         return {
             "date": self.date,
             "amount": self.amount_advance,
@@ -129,7 +132,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
             "journal_id": self.journal_id.id,
             "currency_id": self.journal_currency_id.id,
             "partner_id": order_id.partner_id.id,
-            "payment_method_id": methor_id.id,
+            "payment_method_id": method_id.id,
             "purchase_id": order_id.id,
         }
 
