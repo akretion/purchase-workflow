@@ -207,7 +207,7 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
         digits="Product Unit of Measure",
     )
     qty_received = fields.Float(
-        string="In Receipt Quantity",
+        string="Quantity received",
         related="purchase_order_line_id.qty_received",
         digits="Product Unit of Measure",
     )

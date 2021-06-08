@@ -65,6 +65,7 @@
             </xpath>
             <field name="product_qty" position="after">
                 <field name="qty_in_receipt" />
+                <field name="qty_received" string="Received" />
             </field>
             <field name="date_planned" position="after">
                 <field name="pending_to_receive" />

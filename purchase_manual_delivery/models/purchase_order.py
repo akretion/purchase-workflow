@@ -39,7 +39,7 @@ class PurchaseOrderLine(models.Model):
         string="In Receipt Qty",
         compute_sudo=True,
         store=True,
-        digits=dp.get_precision("Product Unit of Measure"),
+        digits="Product Unit of Measure",
         help="Quantity already planned to receive",
     )
     pending_to_receive = fields.Boolean(
