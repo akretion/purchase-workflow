@@ -37,7 +37,7 @@ class BidSelectionWizard(models.TransientModel):
     def action_confirm_selected_lines(self):
         """
         - Confirm Purchase Orders with selected order_lines
-        - Cancel Purchase Ordres with no selected order_lines
+        - Cancel Purchase Orders with no selected order_lines
         - Deactivate unselected order_lines (only in confirmed Purchase Orders)
         """
         po_to_confirm_ids = self.selected_line_ids.mapped("order_id")
@@ -46,17 +46,45 @@ class BidSelectionWizard(models.TransientModel):
         po_with_unselected_line_ids = unselected_line_ids.mapped("order_id")
         po_to_cancel_ids = po_with_unselected_line_ids - po_to_confirm_ids
 
-        # 1. Confirm - Cancel PO
-        po_to_confirm_ids.button_confirm()
-        po_to_cancel_ids.button_cancel()
-
-        # 2. Deactivate lines
+        # 1. Deactivate lines
         line_to_desactive_ids = unselected_line_ids.filtered(
             lambda l: l.state not in ("done", "cancel")
         )
-        line_to_desactive_ids.write({"active": False})
+        line_to_desactive_ids.unlink()
 
-        # 3. Close Purchase Agreement and back to purchase.requisition form view
+        # 2. Confirm - Cancel PO
+        po_to_confirm_ids.button_confirm()
+        po_to_cancel_ids.button_cancel()
+
+        # 3. Put unselected requisition lines in a new remainder requisition:
+        all_line_keys = set()
+        for line in self.selected_line_ids:
+            all_line_keys.add(
+                (
+                    line.product_id.id,
+                    line.product_qty,
+                    line.move_dest_ids and line.move_dest_ids[0].id or False
+                )
+            )
+        remainder_req = self.requisition_id.copy(
+            {'origin': 'remainder of %s' % (self.requisition_id.name,)}
+        )
+        to_unlink_remainder_lines = self.env['purchase.requisition.line']
+        for req_line in remainder_req.line_ids:
+            key = (
+                    req_line.product_id.id,
+                    req_line.product_qty,
+                    req_line.move_dest_id and req_line.move_dest_id.id or False
+                  )
+            if key in all_line_keys:
+                to_unlink_remainder_lines |= req_line
+
+        if len(to_unlink_remainder_lines) == len(remainder_req.line_ids):
+            remainder_req.unlink()
+        else:
+            to_unlink_remainder_lines.unlink()
+
+        # 4. Close Purchase Agreement and back to purchase.requisition form view
         self.requisition_id.action_done()
 
         req_form_xmlid = "purchase_requisition_selection.view_purchase_requisition_form"
