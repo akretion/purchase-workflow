@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="purchase_order_search" model="ir.ui.view">
+      <field name="name">purchase.order.search for Bid selection</field>
+      <field name="model">purchase.order</field>
+      <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+      <field name="arch" type="xml">
+          <xpath expr="//filter[@name='draft']" position="after">
+              <filter name="is_filled" string="Cotação preenchida" domain="[('is_filled', '=', True), ('state','in',('draft','sent','to approve')]"/>
+          </xpath>
+      </field>
+    </record>
+
     <record id="purchase_order_line_bid_selection_view_tree" model="ir.ui.view">
         <field name="name">purchase.order.line.tree for Bid selection</field>
         <field name="model">purchase.order.line</field>
         <field name="arch" type="xml">
             <tree decoration-info="is_lowest_price_line == True and bid_selection != 'selected'"
                   decoration-success="bid_selection == 'selected'"
-                  decoration-muted="bid_selection == 'rejected'">
+                  decoration-muted="bid_selection == 'rejected'" create="false">
                 <field name="order_id" />
                 <field name="name" />
-                <field name="partner_id" />
+		<field name="partner_id" />
+		<field name="is_filled" />
                 <field name="price_unit" />
                 <field name="product_qty" />
                 <field name="price_subtotal" />

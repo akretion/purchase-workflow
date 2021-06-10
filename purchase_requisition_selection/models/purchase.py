@@ -1,7 +1,18 @@
 # Copyright 2020 Akretion LTDA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
+
+
+class PurchaseOrder(models.Model):
+    _inherit = "purchase.order"
+
+    is_filled = fields.Boolean(default=False, compute='_compute_is_filled', store=True) # True if supplier set price once
+
+    @api.depends('order_line.is_filled')
+    def _compute_is_filled(self):
+        for po in self:
+            po.is_filled = any(l.is_filled for l in po.order_line)
 
 
 class PurchaseOrderLine(models.Model):
@@ -21,6 +32,8 @@ class PurchaseOrderLine(models.Model):
         ],
         default="unselected",
     )
+
+    is_filled = fields.Boolean(default=False) # True if supplier set price once
 
     def action_select_bid(self):
         for line in self:
