@@ -57,15 +57,18 @@ class BidSelectionWizard(models.TransientModel):
         po_to_cancel_ids.button_cancel()
 
         # 3. Put unselected requisition lines in a new remainder requisition:
-        all_line_keys = set()
+        line_remove_keys = set()
         for line in self.selected_line_ids:
-            all_line_keys.add(
-                (
-                    line.product_id.id,
-                    line.product_qty,
-                    line.move_dest_ids and line.move_dest_ids[0].id or False
+            key = False
+            if line.requisition_line_id and line.state == 'purchase':
+                key = (
+                    line.requisition_line_id.product_id.id,
+                    line.requisition_line_id.product_qty,
+                    line.requisition_line_id.origin or False
                 )
-            )
+            if key:
+                line_remove_keys.add(key)
+
         remainder_req = self.requisition_id.copy(
             {'origin': 'remainder of %s' % (self.requisition_id.name,)}
         )
@@ -74,9 +77,10 @@ class BidSelectionWizard(models.TransientModel):
             key = (
                     req_line.product_id.id,
                     req_line.product_qty,
-                    req_line.move_dest_id and req_line.move_dest_id.id or False
+                    req_line.origin or False
                   )
-            if key in all_line_keys:
+            
+            if key in line_remove_keys:
                 to_unlink_remainder_lines |= req_line
 
         if len(to_unlink_remainder_lines) == len(remainder_req.line_ids):
