@@ -18,6 +18,8 @@ class PurchaseOrder(models.Model):
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
+    requisition_line_id = fields.Many2one(comodel_name="purchase.requisition.line")
+
     # Technical field in order to hide unwanted order_line
     active = fields.Boolean(default=True)
 
