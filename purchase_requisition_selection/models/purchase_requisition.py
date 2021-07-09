@@ -76,6 +76,15 @@ class PurchaseRequisition(models.Model):
             line_ids.write({"active": True, "bid_selection": "unselected"})
         self.write({"state": "open"})
 
+    def copy(self, default=None):
+        default = dict(default or [])
+        default_line_ids = [(5, 0, 0)]
+        for rqf_line in self.line_ids:
+            if not rqf_line.purchase_line_ids.filtered(lambda p: p.state == 'purchase'):
+                default_line_ids.append((4, rqf_line.id))
+        default['line_ids'] = default_line_ids
+        return super().copy(default)
+
 
 class PurchaseRequisitionLine(models.Model):
     _inherit = "purchase.requisition.line"
