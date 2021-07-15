@@ -21,6 +21,27 @@ class PurchaseOrderLine(models.Model):
         help="Indicate if the line is cancelled",
     )
 
+    delivered = fields.Boolean(compute="_compute_delivered", store=False)
+
+    @api.multi
+    def _compute_delivered(self):
+        orders = [x.order_id for x in self]
+        order = False
+        if orders and len(list(set(orders))) == 1:
+            # Here is
+            order = self and self[0].order_id
+        for rec in self.sudo():
+            if not order:
+                rec.delivered = False
+            else:
+                for move in rec.move_ids:
+                    # TODO put the right states set here
+                    if move.state == "done":
+                        rec.delivered = True
+                        break
+                if not rec.delivered:
+                    rec.delivered = False
+
     @api.multi
     def _compute_supplier_cancel_status(self):
         for rec in self:
@@ -31,9 +52,7 @@ class PurchaseOrderLine(models.Model):
     def button_update_proposal(self):
         order_ids = [x.order_id for x in self]
         if len(set(order_ids)) > 1:
-            raise UserError(
-                _("You shouldn't update proposal on multiple orders")
-            )
+            raise UserError(_("You shouldn't update proposal on multiple orders"))
         for rec in self:
             vals = {
                 "qty": rec.product_qty,

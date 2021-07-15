@@ -45,6 +45,7 @@ class PurchaseLineProposal(models.Model):
     price_u = fields.Float(
         string="New Price U.", digits_compute=dp.get_precision("Product Price")
     )
+    partially_delivered = fields.Boolean(related="order_id.partially_delivered")
 
     def _compute_supplier_ref(self):
         for rec in self:

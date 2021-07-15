@@ -105,6 +105,7 @@
                                             attrs="{'invisible': [('proposal_state', 'in', ['draft', 'approved'])]}"
                                             groups="purchase_update_proposal.group_purchase_proposal_user,purchase_update_proposal.group_supplier_own_purchase"/>
                                     <field name="proposal_count" invisible="1"/>
+                                    <field name="partially_delivered" invisible="1"/>
                                 </group>
                                 <group colspan="4" attrs="{'invisible': [('proposal_count', '=', 0)]}">
                                     <div attrs="{'invisible': [('proposal_state', '!=', 'draft')]}">Update new fields below and submit modifications.</div>
@@ -127,7 +128,7 @@
                         </group>
                         <field name="order_line" readonly="1">
                             <tree string="Purchase Order Lines" editable="bottom">
-                                <button name="button_supplier_update_proposal" help="Suggest Modification" type="object" string="Update" groups="purchase_update_proposal.group_purchase_proposal_user,purchase_update_proposal.group_supplier_own_purchase"/>
+                                <button name="button_supplier_update_proposal" help="Suggest Modification" type="object" string="Update" groups="purchase_update_proposal.group_purchase_proposal_user,purchase_update_proposal.group_supplier_own_purchase" attrs="{'invisible': [('delivered', '=', True)]}"/>
                                 <field name="proposal_count" invisible="1"/>
                                 <field name="id" attrs="{'invisible': [('proposal_count', '=', 0)]}"/>
                                 <field name="product_id"/>
@@ -139,6 +140,7 @@
                                 <field name="taxes_id" widget="many2many_tags"/>
                                 <field name="price_subtotal"/>
                                 <field name="supplier_cancel_status"/>
+                                <field name="delivered"/>
                                 <field name="state" invisible="1"/>
                             </tree>
                         </field>
