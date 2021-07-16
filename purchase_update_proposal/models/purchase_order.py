@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# © 2021 David BEAL @ Akretion
+# © 2021 David BEAL @ Akretion
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import logging
@@ -45,10 +45,13 @@ class PurchaseOrder(models.Model):
         related="partner_id.check_price_on_proposal"
     )
     proposal_display = fields.Boolean(
-        string="Display/Hide Proposal", help="If checked, rejected proposal are hidden."
+        string="Display/Hide Proposal",
+        help="If checked, rejected proposals are hidden.",
     )
     partially_delivered = fields.Boolean(
-        compute="_compute_partially_delivered", store=False
+        compute="_compute_partially_delivered",
+        store=False,
+        help="Checked if at least partially delivered",
     )
 
     @api.multi
@@ -67,7 +70,7 @@ class PurchaseOrder(models.Model):
             if rec.partially_delivered:
                 for __, vals in rec._prepare_proposal_data().items():
                     for elm in vals:
-                        if "product_qty" in elm or "price_unit" in elm:
+                        if "product_qty" in elm:
                             prevent_update = prevent_update or True
                         else:
                             prevent_update = prevent_update or False
@@ -173,7 +176,7 @@ class PurchaseOrder(models.Model):
         self.ensure_one()
         qty2update = False
         if self.partially_delivered:
-            for __, vals in data:
+            for __, vals in data.items():
                 for key in vals:
                     if "product_qty" in key:
                         qty2update = qty2update or True
@@ -295,3 +298,17 @@ class PurchaseOrder(models.Model):
             )
             if users:
                 self.message_subscribe_users(users.ids)
+
+    @api.multi
+    def button_supplier_view(self):
+        self.ensure_one()
+        return {
+            "res_model": "purchase.order",
+            "res_id": self.id,
+            "view_mode": "form",
+            "target": "current",
+            "type": "ir.actions.act_window",
+            "view_id": self.env.ref(
+                "purchase_update_proposal.supplier_purchase_order_form"
+            ).id,
+        }

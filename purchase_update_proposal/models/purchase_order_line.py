@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# © 2021 David BEAL @ Akretion
+# © 2021 David BEAL @ Akretion
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import logging
@@ -14,33 +14,22 @@ class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
     proposal_count = fields.Integer(related="order_id.proposal_count", store=False)
-
     supplier_cancel_status = fields.Char(
         string="Status",
         compute="_compute_supplier_cancel_status",
         help="Indicate if the line is cancelled",
     )
-
     delivered = fields.Boolean(compute="_compute_delivered", store=False)
 
-    @api.multi
     def _compute_delivered(self):
-        orders = [x.order_id for x in self]
-        order = False
-        if orders and len(list(set(orders))) == 1:
-            # Here is
-            order = self and self[0].order_id
         for rec in self.sudo():
-            if not order:
-                rec.delivered = False
-            else:
-                for move in rec.move_ids:
-                    # TODO put the right states set here
-                    if move.state == "done":
-                        rec.delivered = True
-                        break
-                if not rec.delivered:
-                    rec.delivered = False
+            delivered = False
+            for move in rec.move_ids:
+                # TODO put the right states set here
+                if move.state == "done":
+                    delivered = True
+                    break
+            rec.delivered = delivered
 
     @api.multi
     def _compute_supplier_cancel_status(self):
