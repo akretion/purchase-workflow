@@ -252,6 +252,7 @@ class PurchaseRequestLine(models.Model):
                 rec.is_editable = True
 
     @api.multi
+    @api.depends('product_id.seller_ids')
     def _compute_supplier_id(self):
         for rec in self:
             if rec.product_id:
