@@ -11,6 +11,12 @@ class PurchaseRequestImportProducts(models.TransientModel):
         inverse_name="wizard_id",
     )
 
+    request_id = fields.Many2one(
+        comodel_name="purchase.request",
+        string="Purchase Request",
+        readonly=True,
+    )
+
     def create_items(self):
         for wizard in self:
             for product in wizard.products:
@@ -40,9 +46,10 @@ class PurchaseRequestImportProducts(models.TransientModel):
                 "product_id": item.product_id.id,
                 "product_qty": item.quantity,
                 "product_uom_id": item.product_id.uom_id.id,
+                "date_required": item.date_required,
+                "estimated_cost": item.estimated_cost,
             }
         )
-        purchase_request_line.onchange_product_id()  # ?
         line_values = purchase_request_line._convert_to_write(
             purchase_request_line._cache
         )
@@ -74,4 +81,18 @@ class PurchaseRequestImportProductsItem(models.TransientModel):
     )
     quantity = fields.Float(
         digits="Product Unit of Measure", default=1.0, required=True
+    )
+    date_required = fields.Date(
+        string="Request Date",
+        required=True,
+        default=fields.Date.context_today,
+    )
+    estimated_cost = fields.Monetary(
+        string="Estimated Cost",
+        currency_field="currency_id",
+        default=0.0,
+        help="Estimated cost of Purchase Request Line, not propagated to PO.",
+    )
+    currency_id = fields.Many2one(
+        related="wizard_id.request_id.company_id.currency_id", readonly=True
     )
