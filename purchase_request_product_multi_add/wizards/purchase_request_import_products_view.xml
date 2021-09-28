@@ -7,7 +7,12 @@
             <form string="Products">
                 <field name="products" />
                 <footer>
-                    <button name="create_items" string="Set informations" type="object" class="oe_highlight" />
+                    <button
+                        name="create_items"
+                        string="Set informations"
+                        type="object"
+                        class="oe_highlight"
+                    />
                     or
                     <button string="Cancel" class="oe_link" special="cancel" />
                 </footer>
@@ -29,14 +34,22 @@
                     </tree>
                 </field>
                 <footer>
-                    <button name="select_products" string="Select" type="object" class="oe_highlight" />
+                    <button
+                        name="select_products"
+                        string="Select"
+                        type="object"
+                        class="oe_highlight"
+                    />
                 or
                     <button string="Cancel" class="oe_link" special="cancel" />
                 </footer>
             </form>
         </field>
     </record>
-    <record id="action_import_product_to_purchase_request" model="ir.actions.act_window">
+    <record
+        id="action_import_product_to_purchase_request"
+        model="ir.actions.act_window"
+    >
         <field name="name">Import Products</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">purchase.request.import.products</field>

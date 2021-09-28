@@ -1,7 +1,8 @@
 # Copyright 2021 Akretion - Florian Mounier
 {
     "name": "Purchase Request Product Multi Add",
-    "summary": "This module adds a new wizard to add multiple products at the same time on a purchase request",
+    "summary": "This module adds a new wizard to add multiple products"
+    " at the same time on a purchase request",
     "website": "https://github.com/OCA/purchase-workflow",
     "author": "Akretion, Odoo Community Association (OCA)",
     "category": "Usability",

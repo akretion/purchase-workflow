@@ -6,11 +6,22 @@
         <field name="inherit_id" ref="purchase_request.view_purchase_request_form" />
         <field name="arch" type="xml">
             <notebook position="before">
-                <button name="%(action_import_product_to_purchase_request)d" class="btn-primary" style="margin:12px 0px 12px 0px;" string="Add multiple products" icon="fa-plus-circle" Help="Select Products to Import" type="action" />
+                <button
+                    name="%(action_import_product_to_purchase_request)d"
+                    class="btn-primary"
+                    style="margin:12px 0px 12px 0px;"
+                    string="Add multiple products"
+                    icon="fa-plus-circle"
+                    Help="Select Products to Import"
+                    type="action"
+                />
                 <!-- attrs="{'invisible':[('state','not in', ['draft', 'sent'])]}"  -->
             </notebook>
             <field name="line_ids" position="attributes">
-                <attribute translation="off" name="options">{'always_reload':true}</attribute>
+                <attribute
+                    translation="off"
+                    name="options"
+                >{'always_reload':true}</attribute>
             </field>
         </field>
     </record>
