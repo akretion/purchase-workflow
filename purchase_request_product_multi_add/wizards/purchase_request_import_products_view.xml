@@ -7,49 +7,25 @@
             <form string="Products">
                 <field name="products" />
                 <footer>
-                    <button
-                        name="create_items"
-                        string="Set informations"
-                        type="object"
-                        class="oe_highlight"
-                    />
-                    or
+                    <button name="create_items" string="Import" type="object" class="oe_highlight" />
                     <button string="Cancel" class="oe_link" special="cancel" />
                 </footer>
             </form>
         </field>
     </record>
-    <record id="view_import_product_to_purchase_request2" model="ir.ui.view">
-        <field name="name">import.products.to.purchase.request.form2</field>
-        <field name="model">purchase.request.import.products</field>
+    <record id="view_edit_new_purchase_request_lines" model="ir.ui.view">
+        <field name="name">import.products.to.purchase.request.line.tree</field>
+        <field name="model">purchase.request.line</field>
         <field name="arch" type="xml">
-            <form string="Products">
-                <field name="items">
-                    <tree create="0" editable="bottom">
-                        <field name="product_id" readonly="1" />
-                        <field name="quantity" />
-                        <field name="date_required" />
-                        <field name="estimated_cost" />
-                        <field name="currency_id" invisible="1" />
-                    </tree>
-                </field>
-                <footer>
-                    <button
-                        name="select_products"
-                        string="Select"
-                        type="object"
-                        class="oe_highlight"
-                    />
-                or
-                    <button string="Cancel" class="oe_link" special="cancel" />
-                </footer>
-            </form>
+            <tree create="0" editable="bottom" multi_edit="1">
+                <field name="product_id" readonly="1" />
+                <field name="product_qty" />
+                <field name="date_required" />
+                <field name="estimated_cost" />
+            </tree>
         </field>
     </record>
-    <record
-        id="action_import_product_to_purchase_request"
-        model="ir.actions.act_window"
-    >
+    <record id="action_import_product_to_purchase_request" model="ir.actions.act_window">
         <field name="name">Import Products</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">purchase.request.import.products</field>
