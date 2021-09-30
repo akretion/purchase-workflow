@@ -7,27 +7,21 @@
             <form string="Create Stock Picking">
                 <group>
                     <field name="purchase_id" />
-                    <field
-                        name="picking_id"
-                        domain="[('purchase_id', '=', purchase_id)]"
-                    />
-                    <field
-                        name="scheduled_date"
-                        string="Picking Scheduled Date"
-                        attrs="{'invisible': [('picking_id', '=', False)]}"
-                    />
-                    <field
-                        name="location_dest_id"
-                        attrs="{'readonly': [('picking_id', '!=', False)]}"
-                        groups="stock.group_stock_multi_locations"
-                    />
+                    <field name="picking_type_id"
+                           domain="[('code','=','incoming'), '|', ('warehouse_id', '=', False), ('warehouse_id.company_id', '=', company_id)]"
+                           options="{'no_create': True}"
+                           groups="stock.group_stock_multi_locations" />
+                    <field name="dest_address_id"
+                           attrs="{'invisible': [('default_location_dest_id_usage', '!=', 'customer')], 'required': [('default_location_dest_id_usage', '=', 'customer')]}"
+                           groups="stock.group_stock_multi_locations" />
+                    <field name="default_location_dest_id_usage" invisible="1" />
+                    <field name="company_id" invisible="1" />
                 </group>
                 <group>
                     <field name="line_ids" nolabel="1">
                         <tree create="false" editable="bottom">
                             <field name="purchase_order_line_id" invisible="1" />
                             <field name="product_id" />
-                            <field name="partner_id" />
                             <field name="date_planned" />
                             <field name="price_unit" />
                             <field name="product_qty" string="Ordered Qty" />
@@ -39,12 +33,8 @@
                     </field>
                 </group>
                 <footer>
-                    <button
-                        name="create_stock_picking"
-                        string="Create and View Picking"
-                        type="object"
-                        class="btn-primary"
-                    />
+                    <button name="create_stock_picking" string="Create Picking"
+                            type="object" class="btn-primary" />
                     <button string="Cancel" class="btn-default" special="cancel" />
                 </footer>
             </form>

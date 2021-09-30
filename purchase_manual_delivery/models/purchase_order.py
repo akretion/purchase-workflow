@@ -30,6 +30,27 @@ class PurchaseOrder(models.Model):
             return
         return super()._create_picking()
 
+    def _get_destination_location(self):
+        """Override in order to avoid using PO's original picking type and dropship
+        address"""
+        res = super()._get_destination_location()
+        picking_type_id = self.env.context.get("manual_picking_type")
+        dest_address_id = self.env.context.get("manual_dest_address")
+
+        if dest_address_id:
+            res = dest_address_id.property_stock_customer.id
+        elif picking_type_id:
+            res = picking_type_id.default_location_dest_id.id
+        return res
+
+    def _prepare_picking(self):
+        """Override in order to avoid using PO's original picking type"""
+        res = super()._prepare_picking()
+        picking_type_id = self.env.context.get("manual_picking_type")
+        if picking_type_id:
+            res["picking_type_id"] = picking_type_id.id
+        return res
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
@@ -92,3 +113,36 @@ class PurchaseOrderLine(models.Model):
                 line.pending_to_receive = True
             else:
                 line.pending_to_receive = False
+
+    def _prepare_stock_move_vals(
+        self, picking, price_unit, product_uom_qty, product_uom
+    ):
+        """Override in order to avoid using PO's original picking type and dropship
+        address"""
+        # TODO: override also '_check_orderpoint_picking_type' as it is based
+        # on order_id's picking_type_id too
+
+        res = super()._prepare_stock_move_vals(
+            picking, price_unit, product_uom_qty, product_uom
+        )
+        picking_type_id = self.env.context.get("manual_picking_type")
+        dest_address_id = self.env.context.get("manual_dest_address")
+
+        if picking_type_id:
+            # New description_picking
+            product = self.product_id.with_context(
+                lang=dest_address_id.lang or self.env.user.lang
+            )
+            description_picking = product._get_description(picking_type_id)
+            if self.product_description_variants:
+                description_picking += "\n" + self.product_description_variants
+
+            # Update pickint_type and warehouse
+            res.update(
+                {
+                    "picking_type_id": picking_type_id.id,
+                    "warehouse_id": picking_type_id.warehouse_id.id,
+                }
+            )
+
+        return res

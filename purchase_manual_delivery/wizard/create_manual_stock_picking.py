@@ -20,10 +20,11 @@ class CreateManualStockPickingWizard(models.TransientModel):
             )
         return self.env["purchase.order"].browse(self.env.context["active_id"])
 
-    def _default_location_dest_id(self):
-        return self.env["stock.location"].browse(
-            self._default_purchase_order()._get_destination_location()
-        )
+    def _default_picking_type_id(self):
+        return self._default_purchase_order().picking_type_id
+
+    def _default_dest_address_id(self):
+        return self._default_purchase_order().dest_address_id
 
     @api.model
     def default_get(self, fields):
@@ -82,7 +83,7 @@ class CreateManualStockPickingWizard(models.TransientModel):
                     "product_uom": line.product_uom.id,
                     "currency_id": line.currency_id.id,
                     "partner_id": line.partner_id.id,
-                    # 'taxes_id': line.taxes_id.ids,
+                    "taxes_id": line.taxes_id.ids,
                 },
             )
             for line in po_lines
@@ -100,28 +101,49 @@ class CreateManualStockPickingWizard(models.TransientModel):
         inverse_name="wizard_id",
         string="Lines",
     )
-    picking_id = fields.Many2one("stock.picking", string="Stock Picking")
+    company_id = fields.Many2one("res.company", related="purchase_id.company_id")
     partner_id = fields.Many2one("res.partner", "Vendor")
-    scheduled_date = fields.Datetime(
-        "Scheduled Date", related="picking_id.scheduled_date"
+    picking_type_id = fields.Many2one(
+        comodel_name="stock.picking.type",
+        string="Deliver To",
+        default=_default_picking_type_id,
+        required=True,
     )
-    location_dest_id = fields.Many2one(
-        "stock.location",
-        "Destination Location",
-        default=_default_location_dest_id,
-        help="Location where the system will stock the received products.",
+    dest_address_id = fields.Many2one(
+        comodel_name="res.partner",
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
+        string="Drop Ship Address",
+        default=_default_dest_address_id,
+        help="For the moment this Address is not really useful as it is not transfered "
+        "to the created picking",
+    )
+    default_location_dest_id_usage = fields.Selection(
+        related="picking_type_id.default_location_dest_id.usage",
+        string="Destination Location Type",
+        help="Technical field used to display the Drop Ship Address",
     )
 
-    @api.onchange("picking_id")
-    def onchange_picking_id(self):
-        if self.picking_id:
-            self.location_dest_id = self.picking_id.location_dest_id
+    @api.onchange("picking_type_id")
+    def _onchange_picking_type_id(self):
+        if self.picking_type_id.default_location_dest_id.usage != "customer":
+            self.dest_address_id = False
+
+    def _get_destination_location(self):
+        self.ensure_one()
+        pick_type_dest_loc_id = self.picking_type_id.default_location_dest_id
+
+        if pick_type_dest_loc_id.usage == "customer" and self.dest_address_id:
+            return self.dest_address_id.property_stock_customer.id
+        else:
+            return pick_type_dest_loc_id.id
 
     def _prepare_picking(self):
-        res = self.purchase_id._prepare_picking()
-        if self.location_dest_id:
-            res["location_dest_id"] = self.location_dest_id.id
-        return res
+        return self.purchase_id.with_context(
+            {
+                "manual_picking_type": self.picking_type_id,
+                "manual_dest_address": self.dest_address_id,
+            }
+        )._prepare_picking()
 
     def _create_stock_moves(self, picking_id):
         return self.line_ids._create_stock_moves(picking_id)
@@ -129,12 +151,8 @@ class CreateManualStockPickingWizard(models.TransientModel):
     def create_stock_picking(self):
         StockPicking = self.env["stock.picking"]
 
-        # If a picking has been selected, we add products to the picking
-        # otherwise we create a new picking
-        picking_id = self.picking_id
-        if not picking_id:
-            res = self._prepare_picking()
-            picking_id = StockPicking.create(res)
+        res = self._prepare_picking()
+        picking_id = StockPicking.create(res)
 
         # Check quantity is not above remaining quantity
         if any(line.qty > line.remaining_qty for line in self.line_ids):
@@ -159,16 +177,6 @@ class CreateManualStockPickingWizard(models.TransientModel):
             values={"self": picking_id, "origin": self.purchase_id},
             subtype_id=self.env.ref("mail.mt_note").id,
         )
-
-        return {
-            "name": _("Stock Picking"),
-            "view_type": "form",
-            "view_mode": "form",
-            "res_model": "stock.picking",
-            "view_id": self.env.ref("stock.view_picking_form").id,
-            "res_id": picking_id.id,
-            "type": "ir.actions.act_window",
-        }
 
 
 class CreateManualStockPickingWizardLine(models.TransientModel):
@@ -245,7 +253,12 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
 
     def _prepare_stock_moves(self, picking):
         po_line = self.purchase_order_line_id
-        return po_line._prepare_stock_moves(picking)
+        return po_line.with_context(
+            {
+                "manual_picking_type": self.wizard_id.picking_type_id,
+                "manual_dest_address": self.wizard_id.dest_address_id,
+            }
+        )._prepare_stock_moves(picking)
 
     def _create_stock_moves(self, picking):
         values = []
@@ -259,11 +272,5 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
                     val["product_uom_qty"] = line.product_uom._compute_quantity(
                         line.qty, line.product_uom, rounding_method="HALF-UP"
                     )
-                if (
-                    val.get("location_dest_id", False)
-                    and not line.wizard_id.picking_id
-                    and line.wizard_id.location_dest_id
-                ):
-                    val["location_dest_id"] = line.wizard_id.location_dest_id.id
                 values.append(val)
         return self.env["stock.move"].create(values)
