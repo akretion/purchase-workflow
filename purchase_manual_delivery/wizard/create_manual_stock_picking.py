@@ -138,12 +138,7 @@ class CreateManualStockPickingWizard(models.TransientModel):
             return pick_type_dest_loc_id.id
 
     def _prepare_picking(self):
-        return self.purchase_id.with_context(
-            {
-                "manual_picking_type": self.picking_type_id,
-                "manual_dest_address": self.dest_address_id,
-            }
-        )._prepare_picking()
+        return self.purchase_id.with_context(manual_picking=self)._prepare_picking()
 
     def _create_stock_moves(self, picking_id):
         return self.line_ids._create_stock_moves(picking_id)
@@ -253,12 +248,8 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
 
     def _prepare_stock_moves(self, picking):
         po_line = self.purchase_order_line_id
-        return po_line.with_context(
-            {
-                "manual_picking_type": self.wizard_id.picking_type_id,
-                "manual_dest_address": self.wizard_id.dest_address_id,
-            }
-        )._prepare_stock_moves(picking)
+        wizard = self.wizard_id
+        return po_line.with_context(manual_picking=wizard)._prepare_stock_moves(picking)
 
     def _create_stock_moves(self, picking):
         values = []

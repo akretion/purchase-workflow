@@ -34,21 +34,21 @@ class PurchaseOrder(models.Model):
         """Override in order to avoid using PO's original picking type and dropship
         address"""
         res = super()._get_destination_location()
-        picking_type_id = self.env.context.get("manual_picking_type")
-        dest_address_id = self.env.context.get("manual_dest_address")
+        manual_picking = self.env.context.get("manual_picking")
 
-        if dest_address_id:
-            res = dest_address_id.property_stock_customer.id
-        elif picking_type_id:
-            res = picking_type_id.default_location_dest_id.id
+        if manual_picking:
+            if manual_picking.dest_address_id:
+                res = manual_picking.dest_address_id.property_stock_customer.id
+            elif manual_picking.picking_type_id:
+                res = manual_picking.picking_type_id.default_location_dest_id.id
         return res
 
     def _prepare_picking(self):
         """Override in order to avoid using PO's original picking type"""
         res = super()._prepare_picking()
-        picking_type_id = self.env.context.get("manual_picking_type")
-        if picking_type_id:
-            res["picking_type_id"] = picking_type_id.id
+        manual_picking = self.env.context.get("manual_picking")
+        if manual_picking:
+            res["picking_type_id"] = manual_picking.picking_type_id.id
         return res
 
 
@@ -125,10 +125,11 @@ class PurchaseOrderLine(models.Model):
         res = super()._prepare_stock_move_vals(
             picking, price_unit, product_uom_qty, product_uom
         )
-        picking_type_id = self.env.context.get("manual_picking_type")
-        dest_address_id = self.env.context.get("manual_dest_address")
+        manual_picking = self.env.context.get("manual_picking")
 
-        if picking_type_id:
+        if manual_picking:
+            picking_type_id = manual_picking.picking_type_id
+            dest_address_id = manual_picking.dest_address_id
             # New description_picking
             product = self.product_id.with_context(
                 lang=dest_address_id.lang or self.env.user.lang
@@ -140,6 +141,7 @@ class PurchaseOrderLine(models.Model):
             # Update pickint_type and warehouse
             res.update(
                 {
+                    "partner_id": dest_address_id.id,
                     "picking_type_id": picking_type_id.id,
                     "warehouse_id": picking_type_id.warehouse_id.id,
                 }
