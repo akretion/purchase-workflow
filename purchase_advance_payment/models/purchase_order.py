@@ -134,12 +134,20 @@ class PurchaseOrder(models.Model):
         for order in self:
             order.account_payment_ids.write({"purchase_id": order.id})
 
-    def action_create_invoice(self):
-        """Delete order's payments in 'draft' or 'cancel' when creating a new invoice,
-        in order to avoid unused/unuseful draft payments"""
-        res = super().action_create_invoice()
+    def _cancel_unlink_unposted_payments(self):
+        """Cancel draft payments and delete them"""
         for order in self:
-            pay_ids = order.account_payment_ids
-            pay_ids.filtered(lambda p: p.state in ["draft", "cancel"]).unlink()
+            pay_ids = order.account_payment_ids.filtered(
+                lambda p: p.state in ["draft", "cancel"]
+            )
+            pay_ids.action_cancel()
+            pay_ids.unlink()
 
-        return res
+    def action_create_invoice(self):
+        self._cancel_unlink_unposted_payments()
+        return super().action_create_invoice()
+
+    def write(self, vals):
+        if vals.get("state") == "cancel":
+            self._cancel_unlink_unposted_payments()
+        return super().write(vals)

@@ -5,7 +5,7 @@
       <field name="name">account.payment.tree (in purchase_advance_payment)</field>
       <field name="model">account.payment</field>
       <field name="arch" type="xml">
-          <tree editable="bottom" delete="0" create="0" >
+          <tree editable="bottom" delete="0" create="0" default_order="date">
               <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}" />
               <field name="name" readonly="1" />
               <field name="ref" attrs="{'readonly': [('state', '!=', 'draft')]}" />
