@@ -84,8 +84,13 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         purchase_id = fields.first(purchase_ids)
         purchase = self.env["purchase.order"].browse(purchase_id)
 
+        # Default journal is the first Bank journal
+        journal_id = self.env["account.journal"].search(
+            [("type", "=", "bank")], limit=1
+        )
+
         if "left_to_alloc" in fields_list:
-            res.update({"order_id": purchase.id})
+            res.update({"order_id": sale.id, "journal_id": journal_id.id})
 
         return res
 
