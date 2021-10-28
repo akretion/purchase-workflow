@@ -24,11 +24,6 @@
                     class="text-center"
                 />
               <button
-                    name="action_open"
-                    type="object"
-                    icon="fa-external-link"
-                />
-              <button
                     name="unlink"
                     icon="fa-trash"
                     type="object"
