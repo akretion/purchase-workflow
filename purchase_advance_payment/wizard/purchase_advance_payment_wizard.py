@@ -90,7 +90,7 @@ class AccountVoucherWizardPurchase(models.TransientModel):
         )
 
         if "left_to_alloc" in fields_list:
-            res.update({"order_id": sale.id, "journal_id": journal_id.id})
+            res.update({"order_id": purchase.id, "journal_id": journal_id.id})
 
         return res
 
