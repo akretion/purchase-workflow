@@ -13,7 +13,8 @@ class PurchaseOrder(models.Model):
         copy=False,
         help="When you set this field, the purchase order will be "
         "considered as fully billed, even when there may be ordered "
-        "or delivered quantities pending to bill.",
+        "or delivered quantities pending to bill. To use this field, "
+        "the order must be in 'Locked' state.",
     )
 
     @api.depends("force_invoiced")
