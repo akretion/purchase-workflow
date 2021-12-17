@@ -5,18 +5,20 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form" />
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='button_draft']" position="after">
-                <button
-                    name="%(action_view_account_voucher_wizard)d"
-                    string="Create Payment"
-                    type="action"
-                    groups="account.group_account_invoice"
-                    attrs="{'invisible': ['|', ('state', 'in', ['done','cancel']), ('is_allocated', '=', True)]}"
-                />
-                <field name="is_allocated" invisible="1" />
-            </xpath>
             <xpath expr="//page[@name='products']/div[hasclass('oe_clear')]" position="after">
-                <group string="Payments" groups="account.group_account_invoice">
+                <group string="Payments" groups="account.group_account_invoice" attrs="{'invisible': [('state', '=', 'draft')]}">
+                    <group class="col-6 col-lg-3">
+                        <button
+                            name="%(action_view_account_voucher_wizard)d"
+                            string="Create Payment"
+                            type="action"
+                            icon="fa-plus"
+                            class=""
+                            groups="account.group_account_invoice"
+                            attrs="{'invisible': ['|', ('state', 'in', ['done','cancel']), ('is_allocated', '=', True)]}"
+                        />
+                    </group>
+                    <field name="is_allocated" invisible="1" />
                     <field
                         name="account_payment_ids"
                         nolabel="1"

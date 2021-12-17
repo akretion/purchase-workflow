@@ -86,7 +86,7 @@ msgstr "Calculer le montant de l'avance basé sur le montant total de la Command
 #. module: purchase_advance_payment
 #: model_terms:ir.ui.view,arch_db:purchase_advance_payment.purchase_order_form
 msgid "Create Payment"
-msgstr "Créer un Décaissement"
+msgstr "Ajouter un paiement en avance"
 
 #. module: purchase_advance_payment
 #: model:ir.model.fields,field_description:purchase_advance_payment.field_account_voucher_wizard_purchase__create_uid
