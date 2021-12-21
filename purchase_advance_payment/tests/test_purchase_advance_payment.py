@@ -26,28 +26,17 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
             {"name": "Conference Chair", "type": "consu", "purchase_method": "purchase"}
         )
         cls.product_3 = cls.env["product.product"].create(
-            {
-                "name": "Repair Services",
-                "type": "service",
-                "purchase_method": "purchase",
-            }
+            {"name": "Repair", "type": "service", "purchase_method": "purchase"}
         )
 
         cls.tax = cls.env["account.tax"].create(
-            {
-                "name": "Tax 20",
-                "type_tax_use": "purchase",
-                "amount": 20,
-            }
+            {"name": "Tax 20", "type_tax_use": "purchase", "amount": 20}
         )
 
         cls.currency_euro = cls.env["res.currency"].search([("name", "=", "EUR")])
         cls.currency_usd = cls.env["res.currency"].search([("name", "=", "USD")])
         cls.currency_rate = cls.env["res.currency.rate"].create(
-            {
-                "rate": 1.20,
-                "currency_id": cls.currency_usd.id,
-            }
+            {"rate": 1.20, "currency_id": cls.currency_usd.id}
         )
 
         # purchase Order
@@ -119,24 +108,6 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
         )
         cls.pay_method_out = cls.env.ref("account.account_payment_method_manual_out")
 
-    def test_include_invoice_payments(self):
-        order = self.purchase_order_1
-        order.button_confirm()
-        order.action_create_invoice()
-        invoice_id = order.invoice_ids[0]
-        invoice_id.write({"invoice_date": fields.Date.today()})
-        invoice_id.action_post()
-
-        # Register invoice's payment
-        inv_context = {"active_ids": [invoice_id.id], "active_model": "account.move"}
-        register_pay_wiz_id = (
-            self.env["account.payment.register"]
-            .with_context(inv_context)
-            .create({"amount": 50})
-        )
-        register_pay_wiz_id.action_create_payments()
-        self.assertEqual(order.left_to_pay, 3550)
-
     def test_unlink_payments_when_creating_invoice(self):
         order = self.purchase_order_1
         context_payment = {"active_ids": [order.id], "active_id": order.id}
@@ -154,27 +125,55 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
         with self.assertRaises(MissingError):
             pay_1.state
 
-    def test_post_advance_payment(self):
+    def test_advance_payment_and_invoice_payment(self):
         order = self.purchase_order_1
+        order.button_confirm()
         context_payment = {"active_ids": [order.id], "active_id": order.id}
         advance_payment_1 = (
             self.env["account.voucher.wizard.purchase"]
             .with_context(context_payment)
             .create({"journal_id": self.journal_usd_cash.id, "amount_advance": 100})
         )
-        advance_payment_2 = (
-            self.env["account.voucher.wizard.purchase"]
-            .with_context(context_payment)
-            .create({"journal_id": self.journal_usd_cash.id, "amount_advance": 200})
-        )
+        # Advance payment draft
         advance_payment_1.make_advance_payment()
-        advance_payment_2.make_advance_payment()
-        self.assertEqual(order.left_to_alloc, 3300)
-
-        pay_1 = order.account_payment_ids.filtered(lambda p: p.amount == 100)
+        self.assertEqual(order.left_to_alloc, 3500)
+        self.assertEqual(order.left_to_pay, 3600)
+        # Advance payment posted
+        pay_1 = order.account_payment_ids
         pay_1.action_post()
+        self.assertEqual(order.left_to_alloc, 3500)
         self.assertEqual(order.left_to_pay, 3500)
-        self.assertEqual(order.left_to_alloc, 3300)
+        # Invoice draft
+        order.action_create_invoice()
+        invoice_id = order.invoice_ids[0]
+        invoice_id.write({"invoice_date": fields.Date.today()})
+        self.assertEqual(order.left_to_alloc, 0)
+        self.assertEqual(order.left_to_pay, 3500)
+        # Register invoice's payment
+        invoice_id.action_post()
+        inv_context = {"active_ids": [invoice_id.id], "active_model": "account.move"}
+        register_pay_wiz_id = (
+            self.env["account.payment.register"]
+            .with_context(inv_context)
+            .create({"amount": 50})
+        )
+        register_pay_wiz_id.action_create_payments()
+        self.assertEqual(order.left_to_alloc, 0)
+        self.assertEqual(order.left_to_pay, 3450)
+
+    def test_invoice_bank_payment_reconcile(self):
+        order = self.purchase_order_1
+        order.button_confirm()
+        # Invoice draft
+        order.action_create_invoice()
+        invoice_id = order.invoice_ids[0]
+        invoice_id.write({"invoice_date": fields.Date.today()})
+        self.assertEqual(order.left_to_alloc, 0)
+        self.assertEqual(order.left_to_pay, 3600)
+        invoice_id.action_post()
+        # TODO: Pay invoice through bank reconciliation
+        # self.assertEqual(order.left_to_alloc, 0)
+        # self.assertEqual(order.left_to_pay, 0)
 
     def test_purchase_advance_payment(self):
         self.assertEqual(

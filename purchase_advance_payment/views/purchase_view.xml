@@ -13,7 +13,6 @@
                             string="Create Payment"
                             type="action"
                             icon="fa-plus"
-                            class=""
                             groups="account.group_account_invoice"
                             attrs="{'invisible': ['|', ('state', 'in', ['done','cancel']), ('is_allocated', '=', True)]}"
                         />

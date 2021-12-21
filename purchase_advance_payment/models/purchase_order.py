@@ -61,6 +61,23 @@ class PurchaseOrder(models.Model):
         compute="_compute_purchase_advance_payment",
     )
 
+    def _get_line_amount_in_order_currency(self, line_ids):
+        self.ensure_one()
+        total_amount = 0
+        for line in line_ids:
+            line_currency = line.currency_id or line.company_id.currency_id
+            line_amount = line.amount_currency if line.currency_id else line.balance
+            if line_currency != self.currency_id:
+                line_amount = line.currency_id._convert(
+                    line_amount,
+                    self.currency_id,
+                    self.company_id,
+                    line.date or fields.Date.today(),
+                )
+            total_amount += line_amount
+        return total_amount
+
+    # TODO: this depends list can be optimized
     @api.depends(
         "currency_id",
         "company_id",
@@ -74,36 +91,51 @@ class PurchaseOrder(models.Model):
         "account_payment_ids.move_id.line_ids.credit",
         "account_payment_ids.move_id.line_ids.currency_id",
         "account_payment_ids.move_id.line_ids.amount_currency",
+        "invoice_ids.line_ids.matched_debit_ids",
     )
     def _compute_purchase_advance_payment(self):
         for order in self:
-            mls = order.account_payment_ids.mapped("move_id.line_ids").filtered(
-                lambda x: x.account_id.internal_type == "payable"
-            )
+            # 1) Amount related to advance payments
             advance_draft = 0.0
             advance_posted = 0.0
+            mls = order.account_payment_ids.move_id.line_ids.filtered(
+                lambda x: x.account_id.internal_type == "payable"
+            )
             for line in mls:
-                line_currency = line.currency_id or line.company_id.currency_id
-                line_amount = line.amount_currency if line.currency_id else line.balance
-                if line_currency != order.currency_id:
-                    line_amount = line.currency_id._convert(
-                        line_amount,
-                        order.currency_id,
-                        order.company_id,
-                        line.date or fields.Date.today(),
-                    )
+                line_amount = order._get_line_amount_in_order_currency(line)
                 if line.parent_state == "posted":
                     advance_posted += line_amount
                     advance_draft += line_amount
                 elif line.parent_state == "draft":
                     advance_draft += line_amount
 
-            left_to_alloc = order.amount_total - advance_draft
-            left_to_pay = order.amount_total - advance_posted
+            # 2) Amount related to invoices
+            inv_amount = 0.0
+            inv_bank_matched = 0.0
+            inv_mls = order.invoice_ids.line_ids.filtered(
+                lambda x: x.account_id.internal_type == "payable"
+                and x.parent_state != "cancel"
+            )
+            for inv_line in inv_mls:
+                inv_line_amount = order._get_line_amount_in_order_currency(inv_line)
+                # Invoice lines are "due amounts" whereas Payments lines are "paid
+                # amounts". So the negative sign is necessary here.
+                inv_amount -= inv_line_amount
+                # In case invoices are paid through bank reconciliation,
+                # these payments don't create account.payment (=nothing added to
+                # account_payment_ids) but we still need to calculate the amount paid.
+                matched_line_ids = inv_line.matched_debit_ids.debit_move_id
+                if matched_line_ids and not matched_line_ids.move_id.payment_id:
+                    inv_bank_matched += order._get_line_amount_in_order_currency(
+                        matched_line_ids
+                    )
+
+            left_to_alloc = order.amount_total - max(advance_draft, inv_amount)
+            left_to_pay = order.amount_total - max(advance_posted, inv_bank_matched)
 
             payment_state = "not_paid"
             is_allocated = False
-            if mls:
+            if mls or inv_mls:
                 has_amount_to_pay = float_compare(
                     left_to_pay, 0.0, precision_rounding=order.currency_id.rounding
                 )
