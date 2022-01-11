@@ -10,6 +10,7 @@ msgstr ""
 "PO-Revision-Date: 2021-10-07 09:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -25,11 +26,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:purchase_advance_payment.view_account_voucher_wizard
 msgid "Advance Payment"
 msgstr "Paiement en avance"
-
-#. module: purchase_advance_payment
-#: model:ir.model.fields,field_description:purchase_advance_payment.field_purchase_order__payment_status
-msgid "Advance Payment Status"
-msgstr "Statut du Paiement en avance"
 
 #. module: purchase_advance_payment
 #: model:ir.model.fields,field_description:purchase_advance_payment.field_account_voucher_wizard_purchase__percent_advance
@@ -55,7 +51,8 @@ msgstr "Montant avancé"
 #: code:addons/purchase_advance_payment/wizard/purchase_advance_payment_wizard.py:0
 #, python-format
 msgid "Amount of advance is greater than residual amount on purchase"
-msgstr "Le montant de l'avance est supérieur au montant restant à payer sur la vente"
+msgstr ""
+"Le montant de l'avance est supérieur au montant restant à payer sur la vente"
 
 #. module: purchase_advance_payment
 #: code:addons/purchase_advance_payment/wizard/purchase_advance_payment_wizard.py:0
@@ -81,7 +78,8 @@ msgstr "Calculer l'avance"
 #. module: purchase_advance_payment
 #: model:ir.model.fields,help:purchase_advance_payment.field_account_voucher_wizard_purchase__percent_advance
 msgid "Compute Advance amount based on Order total Amount"
-msgstr "Calculer le montant de l'avance basé sur le montant total de la Commande"
+msgstr ""
+"Calculer le montant de l'avance basé sur le montant total de la Commande"
 
 #. module: purchase_advance_payment
 #: model_terms:ir.ui.view,arch_db:purchase_advance_payment.purchase_order_form
@@ -198,6 +196,7 @@ msgstr "Montant total commande"
 
 #. module: purchase_advance_payment
 #: model:ir.model.fields.selection,name:purchase_advance_payment.selection__purchase_order__payment_status__paid
+#: model_terms:ir.ui.view,arch_db:purchase_advance_payment.purchase_order_form
 msgid "Paid"
 msgstr "Payé"
 
@@ -220,6 +219,12 @@ msgstr "Méthode de paiement"
 #: model_terms:ir.ui.view,arch_db:purchase_advance_payment.view_account_voucher_wizard
 msgid "Payment Reference"
 msgstr "Référence paiement"
+
+#. module: purchase_advance_payment
+#: model:ir.model.fields,field_description:purchase_advance_payment.field_purchase_order__payment_status
+#, fuzzy
+msgid "Payment Status"
+msgstr "Statut du Paiement"
 
 #. module: purchase_advance_payment
 #: model:ir.model.fields,field_description:purchase_advance_payment.field_purchase_order__payment_line_ids

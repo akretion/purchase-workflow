@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html)
 
 from odoo import api, fields, models
-from odoo.tools import float_compare
+from odoo.tools import float_compare, float_is_zero
 
 
 class PurchaseOrder(models.Model):
@@ -48,7 +48,7 @@ class PurchaseOrder(models.Model):
         readonly=True,
         copy=False,
         tracking=True,
-        compute="_compute_purchase_advance_payment",
+        compute="_compute_payment_status",
     )
     is_allocated = fields.Boolean(
         string="Is allocated",
@@ -58,10 +58,33 @@ class PurchaseOrder(models.Model):
         copy=False,
         tracking=True,
         default=False,
-        compute="_compute_purchase_advance_payment",
+        compute="_compute_is_allocated",
     )
 
+    @api.depends("currency_id", "left_to_alloc")
+    def _compute_is_allocated(self):
+        for order in self:
+            pr = order.currency_id.rounding or self.env.company.currency_id.rounding
+            lta = order.left_to_alloc
+            order.is_allocated = float_is_zero(lta, precision_rounding=pr)
+
+    @api.depends("currency_id", "amount_total", "left_to_pay")
+    def _compute_payment_status(self):
+        for order in self:
+            pr = order.currency_id.rounding or self.env.company.currency_id.rounding
+            amt_total = order.amount_total
+            ltp = order.left_to_pay
+            is_paid = float_is_zero(ltp, precision_rounding=pr)
+            has_amt_paid = float_compare(amt_total, ltp, precision_rounding=pr) > 0
+
+            if has_amt_paid:
+                order.payment_status = "paid" if is_paid else "partial"
+            else:
+                order.payment_status = "not_paid"
+
     def _get_line_amount_in_order_currency(self, line_ids):
+        """Returns line_ids amount in order currency.
+        line_ids are AccountMoveLines related to self's invoices."""
         self.ensure_one()
         total_amount = 0
         for line in line_ids:
@@ -82,6 +105,7 @@ class PurchaseOrder(models.Model):
         "currency_id",
         "company_id",
         "amount_total",
+        "invoice_status",
         "account_payment_ids",
         "account_payment_ids.state",
         "account_payment_ids.move_id",
@@ -92,29 +116,32 @@ class PurchaseOrder(models.Model):
         "account_payment_ids.move_id.line_ids.currency_id",
         "account_payment_ids.move_id.line_ids.amount_currency",
         "invoice_ids.line_ids.matched_debit_ids",
+        "invoice_ids.state",
+        "invoice_ids.payment_state",
     )
     def _compute_purchase_advance_payment(self):
         for order in self:
             # 1) Amount related to advance payments
             advance_draft = 0.0
             advance_posted = 0.0
-            mls = order.account_payment_ids.move_id.line_ids.filtered(
+            pay_ids = order.account_payment_ids.filtered(lambda p: p.state != "cancel")
+            pay_mls = pay_ids.move_id.line_ids.filtered(
                 lambda x: x.account_id.internal_type == "payable"
             )
-            for line in mls:
-                line_amount = order._get_line_amount_in_order_currency(line)
-                if line.parent_state == "posted":
+            for pay_line in pay_mls:
+                line_amount = order._get_line_amount_in_order_currency(pay_line)
+                if pay_line.parent_state == "posted":
                     advance_posted += line_amount
                     advance_draft += line_amount
-                elif line.parent_state == "draft":
+                elif pay_line.parent_state == "draft":
                     advance_draft += line_amount
 
             # 2) Amount related to invoices
             inv_amount = 0.0
             inv_bank_matched = 0.0
-            inv_mls = order.invoice_ids.line_ids.filtered(
+            inv_ids = order.invoice_ids.filtered(lambda i: i.state != "cancel")
+            inv_mls = inv_ids.line_ids.filtered(
                 lambda x: x.account_id.internal_type == "payable"
-                and x.parent_state != "cancel"
             )
             for inv_line in inv_mls:
                 inv_line_amount = order._get_line_amount_in_order_currency(inv_line)
@@ -133,27 +160,15 @@ class PurchaseOrder(models.Model):
             left_to_alloc = order.amount_total - max(advance_draft, inv_amount)
             left_to_pay = order.amount_total - max(advance_posted, inv_bank_matched)
 
-            payment_status = "not_paid"
-            is_allocated = False
-            if mls or inv_mls:
-                has_amount_to_pay = float_compare(
-                    left_to_pay, 0.0, precision_rounding=order.currency_id.rounding
-                )
-                has_amount_to_allocate = float_compare(
-                    left_to_alloc, 0.0, precision_rounding=order.currency_id.rounding
-                )
-                if has_amount_to_allocate <= 0:
-                    is_allocated = True
-                if has_amount_to_pay <= 0:
-                    payment_status = "paid"
-                elif has_amount_to_pay > 0:
-                    payment_status = "partial"
+            # Force order as paid if fully invoiced and invoices are paid.
+            # Useful when invoices total amount is different from order's amount
+            invoices_paid = all(inv.payment_state == "paid" for inv in inv_ids)
+            if order.invoice_status == "invoiced" and invoices_paid:
+                left_to_alloc = left_to_pay = 0
 
-            order.payment_line_ids = mls
+            order.payment_line_ids = pay_mls
             order.left_to_alloc = left_to_alloc
             order.left_to_pay = left_to_pay
-            order.payment_status = payment_status
-            order.is_allocated = is_allocated
 
     @api.depends("invoice_ids.line_ids.matched_debit_ids")
     def _compute_account_payment_ids(self):
