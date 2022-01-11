@@ -54,10 +54,10 @@
         <field name="arch" type="xml">
             <field name="invoice_status" position="before">
                 <field
-                    name="advance_payment_status"
-                    decoration-success="advance_payment_status == 'paid'"
-                    decoration-info="advance_payment_status == 'partial'"
-                    decoration-warning="advance_payment_status == 'not_paid'"
+                    name="payment_status"
+                    decoration-success="payment_status == 'paid'"
+                    decoration-info="payment_status == 'partial'"
+                    decoration-warning="payment_status == 'not_paid'"
                     widget="badge"
                     optional="hide"
                 />

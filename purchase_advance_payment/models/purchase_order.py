@@ -37,13 +37,13 @@ class PurchaseOrder(models.Model):
         compute="_compute_purchase_advance_payment",
         store=True,
     )
-    advance_payment_status = fields.Selection(
+    payment_status = fields.Selection(
         selection=[
             ("not_paid", "Not Paid"),
             ("paid", "Paid"),
             ("partial", "Partially Paid"),
         ],
-        string="Advance Payment Status",
+        string="Payment Status",
         store=True,
         readonly=True,
         copy=False,
@@ -133,7 +133,7 @@ class PurchaseOrder(models.Model):
             left_to_alloc = order.amount_total - max(advance_draft, inv_amount)
             left_to_pay = order.amount_total - max(advance_posted, inv_bank_matched)
 
-            payment_state = "not_paid"
+            payment_status = "not_paid"
             is_allocated = False
             if mls or inv_mls:
                 has_amount_to_pay = float_compare(
@@ -145,14 +145,14 @@ class PurchaseOrder(models.Model):
                 if has_amount_to_allocate <= 0:
                     is_allocated = True
                 if has_amount_to_pay <= 0:
-                    payment_state = "paid"
+                    payment_status = "paid"
                 elif has_amount_to_pay > 0:
-                    payment_state = "partial"
+                    payment_status = "partial"
 
             order.payment_line_ids = mls
             order.left_to_alloc = left_to_alloc
             order.left_to_pay = left_to_pay
-            order.advance_payment_status = payment_state
+            order.payment_status = payment_status
             order.is_allocated = is_allocated
 
     @api.depends("invoice_ids.line_ids.matched_debit_ids")

@@ -109,6 +109,7 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
         cls.pay_method_out = cls.env.ref("account.account_payment_method_manual_out")
 
     def test_unlink_payments_when_creating_invoice(self):
+        # Create Advance payment draft
         order = self.purchase_order_1
         context_payment = {"active_ids": [order.id], "active_id": order.id}
         advance_payment_1 = (
@@ -118,7 +119,7 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
         )
         advance_payment_1.make_advance_payment()
         pay_1 = order.account_payment_ids
-
+        # Confirm Order without posting advance payment
         order.button_confirm()
         order.action_create_invoice()
 
@@ -134,11 +135,11 @@ class TestPurchaseAdvancePayment(common.SavepointCase):
             .with_context(context_payment)
             .create({"journal_id": self.journal_usd_cash.id, "amount_advance": 100})
         )
-        # Advance payment draft
+        # Create Advance payment draft
         advance_payment_1.make_advance_payment()
         self.assertEqual(order.left_to_alloc, 3500)
         self.assertEqual(order.left_to_pay, 3600)
-        # Advance payment posted
+        # Post Advance payment
         pay_1 = order.account_payment_ids
         pay_1.action_post()
         self.assertEqual(order.left_to_alloc, 3500)
