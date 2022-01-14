@@ -160,11 +160,12 @@ class PurchaseOrder(models.Model):
             left_to_alloc = order.amount_total - max(advance_draft, inv_amount)
             left_to_pay = order.amount_total - max(advance_posted, inv_bank_matched)
 
-            # Force order as paid if fully invoiced and invoices are paid.
+            # Force order as allocated/paid if fully invoiced and/or invoices are paid.
             # Useful when invoices total amount is different from order's amount
-            invoices_paid = all(inv.payment_state == "paid" for inv in inv_ids)
-            if order.invoice_status == "invoiced" and invoices_paid:
-                left_to_alloc = left_to_pay = 0
+            if order.invoice_status == "invoiced":
+                left_to_alloc = 0
+                if all(inv.payment_state == "paid" for inv in inv_ids):
+                    left_to_pay = 0
 
             order.payment_line_ids = pay_mls
             order.left_to_alloc = left_to_alloc
