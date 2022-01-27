@@ -9,7 +9,7 @@
     "category": "Purchase",
     "license": "AGPL-3",
     "summary": "Allow to add advance payments on purchase orders",
-    "depends": ["purchase"],
+    "depends": ["purchase", "account"],
     "data": [
         "wizard/purchase_advance_payment_wizard_view.xml",
         "views/purchase_view.xml",
