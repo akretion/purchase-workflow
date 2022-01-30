@@ -15,6 +15,7 @@
         "views/purchase_view.xml",
         "views/payment_views.xml",
         "security/ir.model.access.csv",
+        "report/purchase_report_templates.xml",
     ],
     "installable": True,
 }
