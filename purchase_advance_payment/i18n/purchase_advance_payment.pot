@@ -14,6 +14,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: purchase_advance_payment
+#: model_terms:ir.ui.view,arch_db:purchase_advance_payment.report_purchaseorder_document
+msgid "<strong>Amount Due</strong>"
+msgstr ""
+
+#. module: purchase_advance_payment
 #: model:ir.model,name:purchase_advance_payment.model_account_voucher_wizard_purchase
 msgid "Account Voucher Wizard Purchase"
 msgstr ""
@@ -27,6 +32,11 @@ msgstr ""
 #. module: purchase_advance_payment
 #: model:ir.model.fields,field_description:purchase_advance_payment.field_account_voucher_wizard_purchase__percent_advance
 msgid "Advance Percentage"
+msgstr ""
+
+#. module: purchase_advance_payment
+#: model:ir.model.fields,field_description:purchase_advance_payment.field_purchase_order__account_payment_ids
+msgid "Advance payments"
 msgstr ""
 
 #. module: purchase_advance_payment
@@ -196,13 +206,13 @@ msgid "Paid"
 msgstr ""
 
 #. module: purchase_advance_payment
-#: model:ir.model.fields.selection,name:purchase_advance_payment.selection__purchase_order__payment_status__partial
-msgid "Partially Paid"
+#: model_terms:ir.ui.view,arch_db:purchase_advance_payment.report_purchaseorder_document
+msgid "Paid on"
 msgstr ""
 
 #. module: purchase_advance_payment
-#: model:ir.model.fields,field_description:purchase_advance_payment.field_purchase_order__account_payment_ids
-msgid "Pay purchase advanced"
+#: model:ir.model.fields.selection,name:purchase_advance_payment.selection__purchase_order__payment_status__partial
+msgid "Partially Paid"
 msgstr ""
 
 #. module: purchase_advance_payment
