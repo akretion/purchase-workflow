@@ -73,6 +73,7 @@ class PurchaseOrderLine(models.Model):
 
     @api.depends(
         "move_ids",
+        "move_ids.product_uom_qty",
         "move_ids.state",
         "move_ids.location_id",
         "move_ids.location_dest_id",
