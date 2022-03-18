@@ -11,7 +11,7 @@
             </xpath>
             <xpath expr="//page[@name='products']/div[hasclass('oe_clear')]" position="after">
                 <group string="Payments" groups="account.group_account_invoice" attrs="{'invisible': [('state', '=', 'draft')]}">
-                    <group class="col-6 col-lg-3">
+                    <group class="">
                         <button
                             name="%(action_view_account_voucher_wizard)d"
                             string="Create Payment"
@@ -28,6 +28,9 @@
                         colspan="4"
                         context="{'form_view_ref': 'account.view_account_payment_form','tree_view_ref': 'purchase_advance_payment.view_purchase_advance_payment_tree'}"
                     />
+                    <div class="o_row oe_inline" groups="purchase.group_purchase_manager">
+                        <field name="keep_unposted_payments" widget="boolean_toggle" /><span>Keep unposted payments</span>
+                    </div>
                     <group class="oe_subtotal_footer oe_right">
                         <field
                             name="left_to_alloc"

@@ -60,6 +60,12 @@ class PurchaseOrder(models.Model):
         default=False,
         compute="_compute_is_allocated",
     )
+    keep_unposted_payments = fields.Boolean(
+        string="Keep unposted payments",
+        help="If checked, the unposted payments won't be deleted when creating invoice "
+        "from Purchase Order",
+        copy=False,
+    )
 
     @api.depends("currency_id", "left_to_alloc")
     def _compute_is_allocated(self):
@@ -192,7 +198,8 @@ class PurchaseOrder(models.Model):
             pay_ids.unlink()
 
     def action_create_invoice(self):
-        self._cancel_unlink_unposted_payments()
+        if not self.keep_unposted_payments:
+            self._cancel_unlink_unposted_payments()
         return super().action_create_invoice()
 
     def write(self, vals):
