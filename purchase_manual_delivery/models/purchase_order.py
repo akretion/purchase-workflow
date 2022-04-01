@@ -129,6 +129,7 @@ class PurchaseOrderLine(models.Model):
         manual_picking = self.env.context.get("manual_picking")
 
         if manual_picking:
+            # New picking_type and warehouse
             picking_type_id = manual_picking.picking_type_id
             dest_address_id = manual_picking.dest_address_id
             # New description_picking
@@ -139,12 +140,12 @@ class PurchaseOrderLine(models.Model):
             if self.product_description_variants:
                 description_picking += "\n" + self.product_description_variants
 
-            # Update pickint_type and warehouse
             res.update(
                 {
                     "partner_id": dest_address_id.id,
                     "picking_type_id": picking_type_id.id,
                     "warehouse_id": picking_type_id.warehouse_id.id,
+                    "description_picking": description_picking,
                 }
             )
 

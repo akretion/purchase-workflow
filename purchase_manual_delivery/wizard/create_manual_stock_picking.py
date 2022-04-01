@@ -259,9 +259,12 @@ class CreateManualStockPickingWizardLine(models.TransientModel):
                 val["date"] = line.date_planned
                 val["date_deadline"] = line.date_planned + timedelta(days=po_lead)
 
-                if val.get("product_uom_qty", False):
+                if val.get("product_uom"):
+                    # val["product_uom"] is already the stock.move's UoM
+                    product_uom = self.env["uom.uom"].browse([val["product_uom"]])
+                    # Convert line's qty in stock.move's UoM
                     val["product_uom_qty"] = line.product_uom._compute_quantity(
-                        line.qty, line.product_uom, rounding_method="HALF-UP"
+                        line.qty, product_uom, rounding_method="HALF-UP"
                     )
                 values.append(val)
         return self.env["stock.move"].create(values)
