@@ -38,8 +38,8 @@ class Test(SavepointCase):
         assert len(po.order_line) == 1
         pol = po.order_line
         po.action_create_invoice()
-        import pdb; pdb.set_trace()
         assert pol.product_id.purchase_method == "purchase"
+        # import pdb; pdb.set_trace()
         res = pol.unlink()
         assert res is True
 

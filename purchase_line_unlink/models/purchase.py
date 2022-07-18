@@ -28,62 +28,57 @@ class PurchaseOrderLine(models.Model):
         """
         unlinkable = {}
         lines = defaultdict(dict)
-        pol2unlink = []
         for rec in self:
-            if rec.order_id and rec.order_id in ("draft", "sent", "to approve"):
-            # if rec.order_id:
+            # if rec.order_id and rec.order_id.state in ("draft", "sent", "to approve"):
+            if rec.order_id:
                 policy = rec._get_invoice_policy()
                 if policy not in lines:
                     lines[rec.order_id][policy] = []
                 lines[rec.order_id][policy].append(rec.id)
         for po, policy_data in lines.items():
             # if "receive" in policy_data:
-            #     pol2unlink.extend(self._unlink_stock_moves(policy_data["receive"]))
-            if "purchase" in policy_data:
+            if "purchase" in policy_data.keys():
                 unlinkable.update(
-                    self.browse(policy_data["purchase"])._unlink_draft_invoice_lines()
+                    self.browse(policy_data["purchase"])._unlinkable_move_lines()
                 )
-                pol2unlink_inv = self._unlink_draft_invoice_lines(
-                    policy_data["purchase"]
+                import pdb; pdb.set_trace()
+                unlinkable.update(
+                    self.browse(policy_data["purchase"])._unlinkable_stock_moves()
                 )
-                pol2unlink_stk = [
-                    x for x in policy_data["receive"] if x in pol2unlink_inv
-                ]
-                pol2unlink.extend(self._unlink_stock_moves(pol2unlink_stk))
-            if "no" in policy_data:
-                pol2unlink.extend(policy_data["no"])
-            return pol2unlink
+            # if "no" in policy_data:
+            #     unlinkable[po]
+            #     pol2unlink.extend(policy_data["no"])
+            return unlinkable
 
-    def _unlink_stock_moves(self, pol_ids):
+    def _unlinkable_stock_moves(self):
         self.ensure_one()
-        pol2unlink = []
-        for pol in self.browse(pol_ids):
-            mstate = pol.invoice_lines.mapped("state")
-            pstate = pol.move_ids.mapped("move_id.state")
-            if (
-                len(mstate) == 1
-                and mstate == "draft"
-                and len(pstate) == 1
-                and pstate == "draft"
-            ):
-                pol.move_ids.unlink()
-                pol2unlink.append(pol.id)
-        return pol2unlink
+        unlinkable = defaultdict(dict)
+        for pol in self:
+            relevant_state = pol.move_ids._get_relevant_state_among_moves()
+            if relevant_state == "assigned":
+                pol.move_ids.filtered(lambda s: s.state == "assigned")._do_unreserve()
+            pol.move_ids._action_cancel()
+            moves = pol.move_ids
+            states = pol.move_ids.mapped("state")
+            if sorted(states) == ["cancel", "draft"]:
+                import pdb; pdb.set_trace()
+                unlinkable[pol.id]["stk"] = moves.ids
+        return unlinkable
 
-    def _unlink_draft_invoice_lines(self):
+    def _unlinkable_move_lines(self):
         self.ensure_one()
-        unlinkable = {}
-        pol2unlink = []
-        import pdb; pdb.set_trace()
+        unlinkable = defaultdict(dict)
+        # pol2unlink = []
         for pol in self:
             lines = pol.invoice_lines
-            import pdb; pdb.set_trace()
-            assert len(lines) ==2
-            state = pol.invoice_lines.mapped("parent_state")
-            if len(state) == 1 and state == "draft":
-                pol.invoice_lines.unlink()
-                pol2unlink.append(pol.id)
-        return pol2unlink
+            state = lines.mapped("parent_state")
+            if len(state) == 1 and state[0] == "draft":
+                line_ids = []
+                for move in lines.mapped("move_id"):
+                    line_ids.extend(move.line_ids.ids)
+                unlinkable[pol.id]["inv"] = line_ids
+                # pol2unlink.append(pol.id)
+        return unlinkable
 
     def unlink(self):
         """We need to catch raise behavior when"""
