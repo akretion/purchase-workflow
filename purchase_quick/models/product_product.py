@@ -70,18 +70,21 @@ class ProductProduct(models.Model):
             )
             args.append(("id", "in", po_lines.mapped("product_id").ids))
         if self.env.context.get("for_current_supplier") and purchase:
-            seller = purchase.partner_id
-            seller = seller.commercial_partner_id or seller
-            args += [
-                "|",
-                ("variant_specific_seller_ids.name", "=", seller.id),
-                "&",
-                ("seller_ids.name", "=", seller.id),
-                ("product_variant_ids", "!=", False),
-            ]
+            args += self._get_supplier_domain(purchase)
         return super(ProductProduct, self).search(
             args, offset=offset, limit=limit, order=order, count=count
         )
+
+    def _get_supplier_domain(self, purchase):
+        seller = purchase.partner_id
+        seller = seller.commercial_partner_id or seller
+        return [
+            "|",
+            ("variant_specific_seller_ids.name", "=", seller.id),
+            "&",
+            ("seller_ids.name", "=", seller.id),
+            ("product_variant_ids", "!=", False),
+        ]
 
     @api.model
     def check_access_rights(self, operation, raise_exception=True):
