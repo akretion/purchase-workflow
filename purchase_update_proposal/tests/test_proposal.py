@@ -118,9 +118,6 @@ class Test(common.TransactionCase):
         order_w_adm.proposal_ids[1].qty = 99
         order_w_adm.submit_proposal()
         order_w_adm.approve_proposal()
-        import pdb
-
-        pdb.set_trace()
         assert order_w_adm.order_line[0].product_qty == 0
         assert order_w_adm.order_line[1].product_qty != 0
         assert order_w_adm.state != "cancel"
