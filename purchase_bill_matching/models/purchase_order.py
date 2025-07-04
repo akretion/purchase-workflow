@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 from odoo import models, fields, _, Command
-
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
@@ -32,26 +32,13 @@ class PurchaseOrder(models.Model):
 
     def _create_downpayments(self, line_vals):
         self.ensure_one()
-
         if not any(line.display_type and line.is_downpayment for line in self.order_line):
-            section_line = self.env['purchase.order.line'].create(self._prepare_down_payment_section_values())
-        else:
-            section_line = self.order_line.filtered(lambda line: line.display_type and line.is_downpayment)
+            self.env['purchase.order.line'].create(self._prepare_down_payment_section_values())
 
-        vals = [
-            {
-                **line_val,
-                'sequence': section_line.sequence + i,
-            }
-            for i, line_val in enumerate(line_vals, start=1)
-        ]
-        downpayment_lines = self.env['purchase.order.line'].create(vals)
-        self.order_line = [
-            Command.link(line_id)
-            for line_id in downpayment_lines.ids
-        ]
+        # The lines are automatically linked to the PO via 'order_id' in their values.
+        # No need to re-assign to self.order_line.
+        downpayment_lines = self.env['purchase.order.line'].create(line_vals)
         return downpayment_lines
-
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'

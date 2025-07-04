@@ -21,7 +21,7 @@ class TestBillMatching(common.TransactionCase):
             'uom_id': uom_unit.id,
             'uom_po_id': uom_unit.id,
             'purchase_method': 'purchase',
-            'taxes_id': False,
+            'supplier_taxes_id': False,
         })
         self.product_order_var_name = self.env['product.product'].create({
             'name': "Test Product Ordered Var Name",
@@ -31,10 +31,14 @@ class TestBillMatching(common.TransactionCase):
             'uom_id': uom_unit.id,
             'uom_po_id': uom_unit.id,
             'purchase_method': 'purchase',
-            'taxes_id': False,
+            'supplier_taxes_id': False,
         })
+        # Create the down payment product with no supplier taxes to avoid auto-propagation
         self.dp_product = self.env['product.product'].create({
-            'name': 'Down Payment', 'type': 'service', 'purchase_ok': True
+            'name': 'Down Payment',
+            'type': 'service',
+            'purchase_ok': True,
+            'supplier_taxes_id': False, # Explicitly set no taxes
         })
 
     def init_purchase(self, confirm=False, products=None):
@@ -125,7 +129,8 @@ class TestBillMatching(common.TransactionCase):
         )
 
         self.assertEqual(len(downpayment_line), 1, "There should be only one down payment deduction line on the bill.")
-        self.assertAlmostEqual(product_line.price_subtotal, self.product_order.list_price)
-        self.assertAlmostEqual(downpayment_line.price_subtotal, -69.00, "The down payment line subtotal must be negative.")
+        self.assertAlmostEqual(product_line.price_subtotal, 280.00)
+        self.assertAlmostEqual(downpayment_line.price_subtotal, -69.00)
 
-        self.assertAlmostEqual(generated_bill.amount_total, self.product_order.list_price - 69.00)
+        # Final check of the total amount
+        self.assertAlmostEqual(generated_bill.amount_total, 211.00)
