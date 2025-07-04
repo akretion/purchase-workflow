@@ -16,14 +16,14 @@ class BillToPoWizard(models.TransientModel):
 
     def _get_downpayment_product(self):
         """Finds or creates a default 'Down Payment' product."""
-        dp_product = self.env['product.product'].search([('name', '=', 'Down Payment')], limit=1)
+        dp_product = self.env['product.product'].search([('name', '=', 'Down Payment'), ('type', '=', 'service')], limit=1)
         if not dp_product:
             dp_product = self.env['product.product'].create({
                 'name': 'Down Payment',
                 'type': 'service',
                 'purchase_ok': True,
                 'sale_ok': False,
-                #'invoice_policy': 'order',
+                # In v16, for a service product, purchase_method defaults to 'purchase', which is correct for down payments.
                 'taxes_id': False,
             })
         return dp_product
@@ -31,17 +31,15 @@ class BillToPoWizard(models.TransientModel):
     def action_add_to_po(self):
         self.ensure_one()
         lines = self._get_active_lines()
-        aml_ids = lines.aml_id
+        aml_ids = lines.mapped('aml_id')
 
         if not self.purchase_order_id:
-            # Create a new PO if none is selected
             self.purchase_order_id = self.env['purchase.order'].create({'partner_id': self.partner_id.id})
 
         po_lines_vals = aml_ids._prepare_line_values_for_purchase()
-        new_lines = []
         for vals in po_lines_vals:
             vals['order_id'] = self.purchase_order_id.id
-            new_lines.append(self.env['purchase.order.line'].create(vals))
+            self.env['purchase.order.line'].create(vals)
 
         aml_ids.unlink()
 
@@ -53,7 +51,7 @@ class BillToPoWizard(models.TransientModel):
     def action_add_downpayment(self):
         self.ensure_one()
         lines = self._get_active_lines()
-        aml_ids = lines.aml_id
+        aml_ids = lines.mapped('aml_id')
 
         if not self.purchase_order_id:
             self.purchase_order_id = self.env['purchase.order'].create({'partner_id': self.partner_id.id})
@@ -65,7 +63,7 @@ class BillToPoWizard(models.TransientModel):
                 'name': _("Down Payment: %s", line.move_id.name or line.name),
                 'product_id': dp_product.id,
                 'product_qty': 1,
-                'price_unit': -line.price_subtotal, # Negative price to deduct
+                'price_unit': -line.price_subtotal,  # Negative price to represent a deduction
                 'is_downpayment': True,
                 'order_id': self.purchase_order_id.id,
                 'product_uom': dp_product.uom_po_id.id,
