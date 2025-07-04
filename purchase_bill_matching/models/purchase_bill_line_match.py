@@ -1,10 +1,7 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
+# -*- coding: utf-8 -*-
+from collections import defaultdict
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-# Remove the SQL import, it's not used in Odoo 16 this way.
-# from odoo.tools.sql import SQL
-
 
 class PurchaseBillMatch(models.Model):
     _name = "purchase.bill.line.match"
@@ -66,7 +63,10 @@ class PurchaseBillMatch(models.Model):
 
     def _compute_product_uom_qty(self):
         for line in self:
-            line.product_uom_qty = line.line_uom_id._compute_quantity(line.line_qty, line.product_uom_id)
+            if line.line_uom_id:
+                line.product_uom_qty = line.line_uom_id._compute_quantity(line.line_qty, line.product_uom_id)
+            else:
+                line.product_uom_qty = 0.0
 
     @api.depends('aml_id.price_unit', 'pol_id.price_unit')
     def _compute_product_uom_price(self):
@@ -75,7 +75,6 @@ class PurchaseBillMatch(models.Model):
 
     @api.model
     def _select_po_line(self):
-        # Return a raw string instead of a SQL object
         return """
             SELECT pol.id,
                    pol.id as pol_id,
@@ -100,9 +99,8 @@ class PurchaseBillMatch(models.Model):
 
     @api.model
     def _select_am_line(self):
-        # Return a raw string and adapt fields for v16
         return """
-            SELECT -aml.id,
+            SELECT -aml.id as id,
                    NULL as pol_id,
                    aml.id as aml_id,
                    aml.company_id as company_id,
@@ -126,7 +124,6 @@ class PurchaseBillMatch(models.Model):
 
     @property
     def _table_query(self):
-        # Use standard string formatting
         return '(%s) UNION ALL (%s)' % (self._select_po_line(), self._select_am_line())
 
     def action_open_line(self):
@@ -140,17 +137,21 @@ class PurchaseBillMatch(models.Model):
 
     @api.model
     def _action_create_bill_from_po_lines(self, partner, po_lines):
-        """ Create a new vendor bill with the selected PO lines and returns an action to open it """
-        bill = self.env['account.move'].with_context(default_move_type='in_invoice').create({
+        bill_vals = {
+            'move_type': 'in_invoice',
             'partner_id': partner.id,
             'invoice_date': fields.Date.context_today(self),
-        })
-        bill._add_purchase_order_lines(po_lines)
+        }
+        bill = self.env['account.move'].with_context(default_move_type='in_invoice').create(bill_vals)
+        for po_line in po_lines:
+            bill.invoice_line_ids.create(po_line._prepare_account_move_line(bill))
 
-        # Build the action manually for Odoo 16
         action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_in_invoice_type")
-        action['views'] = [(self.env.ref('account.view_move_form').id, 'form')]
-        action['res_id'] = bill.id
+        action.update({
+            'view_mode': 'form',
+            'res_id': bill.id,
+            'views': [[self.env.ref('account.view_move_form').id, 'form']],
+        })
         return action
 
     def action_match_lines(self):
@@ -161,14 +162,20 @@ class PurchaseBillMatch(models.Model):
         if len(self.aml_id.move_id) > 1:
             raise UserError(_("You can't select lines from multiple Vendor Bill to do the matching."))
 
-        pol_by_product = self.pol_id.grouped('product_id')
-        aml_by_product = self.aml_id.grouped('product_id')
+        # Fix: Replace .grouped() with a defaultdict implementation
+        pol_by_product = defaultdict(lambda: self.env['purchase.order.line'])
+        for line in self.pol_id:
+            pol_by_product[line.product_id] |= line
+
+        aml_by_product = defaultdict(lambda: self.env['account.move.line'])
+        for line in self.aml_id:
+            aml_by_product[line.product_id] |= line
+
         residual_purchase_order_lines = self.pol_id
         residual_account_move_lines = self.aml_id
         residual_bill = self.aml_id.move_id
 
         for product, po_lines in pol_by_product.items():
-            # In case of multiple POL with same product, only match the first one for simplicity
             po_line = po_lines[0]
             matching_bill_lines = aml_by_product.get(product)
             if matching_bill_lines:
