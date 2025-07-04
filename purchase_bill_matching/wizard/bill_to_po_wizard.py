@@ -1,6 +1,6 @@
+# -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-
 
 class BillToPoWizard(models.TransientModel):
     _name = 'bill.to.po.wizard'
@@ -8,26 +8,27 @@ class BillToPoWizard(models.TransientModel):
 
     purchase_order_id = fields.Many2one('purchase.order', string="Purchase Order")
     partner_id = fields.Many2one('res.partner', string="Vendor", required=True)
+    has_products = fields.Boolean()
 
     def _get_active_lines(self):
         active_ids = self.env.context.get('active_ids', [])
         return self.env['purchase.bill.line.match'].browse(active_ids)
 
+    def _get_downpayment_product(self):
+        """Finds or creates a default 'Down Payment' product."""
+        dp_product = self.env['product.product'].search([('name', '=', 'Down Payment')], limit=1)
+        if not dp_product:
+            dp_product = self.env['product.product'].create({
+                'name': 'Down Payment',
+                'type': 'service',
+                'purchase_ok': True,
+                'sale_ok': False,
+                #'invoice_policy': 'order',
+                'taxes_id': False,
+            })
+        return dp_product
+
     def action_add_to_po(self):
-        self.ensure_one()
-        lines = self._get_active_lines()
-        aml_ids = lines.aml_id
-
-        if not self.purchase_order_id:
-            raise UserError(_("You must select a Purchase Order."))
-
-        po_lines_vals = aml_ids._prepare_line_values_for_purchase()
-        self.purchase_order_id.order_line = [(0, 0, vals) for vals in po_lines_vals]
-        aml_ids.unlink()
-
-        return self.purchase_order_id.action_view_purchase_order()
-
-    def action_add_downpayment(self):
         self.ensure_one()
         lines = self._get_active_lines()
         aml_ids = lines.aml_id
@@ -36,13 +37,39 @@ class BillToPoWizard(models.TransientModel):
             # Create a new PO if none is selected
             self.purchase_order_id = self.env['purchase.order'].create({'partner_id': self.partner_id.id})
 
+        po_lines_vals = aml_ids._prepare_line_values_for_purchase()
+        new_lines = []
+        for vals in po_lines_vals:
+            vals['order_id'] = self.purchase_order_id.id
+            new_lines.append(self.env['purchase.order.line'].create(vals))
+
+        aml_ids.unlink()
+
+        action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_form_action")
+        action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
+        action['res_id'] = self.purchase_order_id.id
+        return action
+
+    def action_add_downpayment(self):
+        self.ensure_one()
+        lines = self._get_active_lines()
+        aml_ids = lines.aml_id
+
+        if not self.purchase_order_id:
+            self.purchase_order_id = self.env['purchase.order'].create({'partner_id': self.partner_id.id})
+
+        dp_product = self._get_downpayment_product()
+
         po_lines_vals = [
             {
-                'name': _("Down Payment (ref: %s)", line.name),
-                'product_qty': -1,
-                'price_unit': line.price_unit,
+                'name': _("Down Payment: %s", line.move_id.name or line.name),
+                'product_id': dp_product.id,
+                'product_qty': 1,
+                'price_unit': -line.price_subtotal, # Negative price to deduct
                 'is_downpayment': True,
                 'order_id': self.purchase_order_id.id,
+                'product_uom': dp_product.uom_po_id.id,
+                'date_planned': self.purchase_order_id.date_planned or fields.Date.today(),
             }
             for line in aml_ids
         ]
@@ -51,4 +78,7 @@ class BillToPoWizard(models.TransientModel):
         for i, line in enumerate(aml_ids):
             line.purchase_line_id = dp_lines[i]
 
-        return self.purchase_order_id.action_view_purchase_order()
+        action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_form_action")
+        action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
+        action['res_id'] = self.purchase_order_id.id
+        return action
