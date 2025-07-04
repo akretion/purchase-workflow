@@ -59,7 +59,7 @@ class BillToPoWizard(models.TransientModel):
 
         po_lines_vals = [
             {
-                'name': _("Down Payment: %s", line.move_id.name or line.name),
+                'name': _("Down Payment Deduction: %s", line.move_id.name or line.name),
                 'product_id': dp_product.id,
                 'product_qty': -1,  # Use negative quantity for deduction
                 'price_unit': line.price_subtotal, # Use positive price
@@ -71,9 +71,11 @@ class BillToPoWizard(models.TransientModel):
             for line in aml_ids
         ]
 
-        dp_lines = self.purchase_order_id._create_downpayments(po_lines_vals)
-        for i, line in enumerate(aml_ids):
-            line.purchase_line_id = dp_lines[i]
+        # This creates the down payment line(s) on the purchase order
+        self.purchase_order_id._create_downpayments(po_lines_vals)
+
+        # We do not link the original bill line to the new PO line.
+        # This ensures qty_invoiced on the new PO line is 0, making qty_to_invoice = -1.
 
         action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_form_action")
         action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
