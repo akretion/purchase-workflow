@@ -110,8 +110,8 @@ class TestBillMatching(common.TransactionCase):
         po_dp_line = po.order_line.filtered(lambda l: l.is_downpayment and l.display_type is False)
         self.assertTrue(po_dp_line, "Down payment line should be created on the PO.")
         self.assertEqual(len(po_dp_line), 1, "There should be only one accountable down payment line.")
-        self.assertEqual(po_dp_line.price_unit, 69.00) # Price is positive
-        self.assertEqual(po_dp_line.product_qty, -1)  # Quantity is negative
+        self.assertEqual(po_dp_line.price_unit, 69.00)
+        self.assertEqual(po_dp_line.product_qty, -1)
 
         po.order_line.filtered(lambda l: not l.is_downpayment)[0].qty_received = 1
         action_view_bill = po.action_create_invoice()
@@ -126,6 +126,6 @@ class TestBillMatching(common.TransactionCase):
 
         self.assertEqual(len(downpayment_line), 1, "There should be only one down payment deduction line on the bill.")
         self.assertAlmostEqual(product_line.price_subtotal, self.product_order.list_price)
-        self.assertAlmostEqual(downpayment_line.price_subtotal, -69.00)
+        self.assertAlmostEqual(downpayment_line.price_subtotal, -69.00, "The down payment line subtotal must be negative.")
 
         self.assertAlmostEqual(generated_bill.amount_total, self.product_order.list_price - 69.00)
