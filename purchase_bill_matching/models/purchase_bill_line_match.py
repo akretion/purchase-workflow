@@ -1,9 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-
-from odoo.tools.sql import SQL
 from odoo.exceptions import UserError
+# Remove the SQL import, it's not used in Odoo 16 this way.
+# from odoo.tools.sql import SQL
 
 
 class PurchaseBillMatch(models.Model):
@@ -75,7 +75,8 @@ class PurchaseBillMatch(models.Model):
 
     @api.model
     def _select_po_line(self):
-        return SQL("""
+        # Return a raw string instead of a SQL object
+        return """
             SELECT pol.id,
                    pol.id as pol_id,
                    NULL as aml_id,
@@ -93,13 +94,14 @@ class PurchaseBillMatch(models.Model):
               FROM purchase_order_line pol
          LEFT JOIN purchase_order po ON pol.order_id = po.id
              WHERE pol.state in ('purchase', 'done')
-               AND pol.product_qty > pol.qty_invoiced
-                OR ((pol.display_type IS NULL OR pol.display_type != 'line_section') AND pol.is_downpayment AND pol.qty_invoiced > 0)
-        """)
+               AND (pol.product_qty > pol.qty_invoiced
+                OR (pol.is_downpayment AND pol.qty_invoiced > 0))
+        """
 
     @api.model
     def _select_am_line(self):
-        return SQL("""
+        # Return a raw string and adapt fields for v16
+        return """
             SELECT -aml.id,
                    NULL as pol_id,
                    aml.id as aml_id,
@@ -111,7 +113,7 @@ class PurchaseBillMatch(models.Model):
                    NULL as qty_invoiced,
                    NULL as purchase_order_id,
                    am.id as account_move_id,
-                   aml.balance as line_amount_untaxed,
+                   aml.price_subtotal as line_amount_untaxed,
                    aml.currency_id as currency_id,
                    am.state as state
               FROM account_move_line aml
@@ -120,11 +122,12 @@ class PurchaseBillMatch(models.Model):
                AND am.move_type in ('in_invoice', 'in_refund')
                AND am.state in ('draft', 'posted')
                AND aml.purchase_line_id IS NULL
-        """)
+        """
 
     @property
     def _table_query(self):
-        return SQL("%s UNION ALL %s") % (self._select_po_line(), self._select_am_line())
+        # Use standard string formatting
+        return '(%s) UNION ALL (%s)' % (self._select_po_line(), self._select_am_line())
 
     def action_open_line(self):
         self.ensure_one()
@@ -138,12 +141,17 @@ class PurchaseBillMatch(models.Model):
     @api.model
     def _action_create_bill_from_po_lines(self, partner, po_lines):
         """ Create a new vendor bill with the selected PO lines and returns an action to open it """
-        bill = self.env['account.move'].create({
-            'move_type': 'in_invoice',
+        bill = self.env['account.move'].with_context(default_move_type='in_invoice').create({
             'partner_id': partner.id,
+            'invoice_date': fields.Date.context_today(self),
         })
         bill._add_purchase_order_lines(po_lines)
-        return bill.action_view_invoice()
+
+        # Build the action manually for Odoo 16
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_in_invoice_type")
+        action['views'] = [(self.env.ref('account.view_move_form').id, 'form')]
+        action['res_id'] = bill.id
+        return action
 
     def action_match_lines(self):
         if not self.pol_id:
@@ -159,8 +167,9 @@ class PurchaseBillMatch(models.Model):
         residual_account_move_lines = self.aml_id
         residual_bill = self.aml_id.move_id
 
-        for product, po_line in pol_by_product.items():
-            po_line = po_line[0]
+        for product, po_lines in pol_by_product.items():
+            # In case of multiple POL with same product, only match the first one for simplicity
+            po_line = po_lines[0]
             matching_bill_lines = aml_by_product.get(product)
             if matching_bill_lines:
                 matching_bill_lines.purchase_line_id = po_line.id
@@ -170,7 +179,8 @@ class PurchaseBillMatch(models.Model):
         if residual_account_move_lines:
             residual_account_move_lines.unlink()
 
-        residual_bill._add_purchase_order_lines(residual_purchase_order_lines)
+        if residual_purchase_order_lines:
+            residual_bill._add_purchase_order_lines(residual_purchase_order_lines)
 
     def action_add_to_po(self):
         if not self or not self.aml_id:
