@@ -33,13 +33,8 @@ class TestBillMatching(common.TransactionCase):
             'purchase_method': 'purchase',
             'taxes_id': False,
         })
-        # Create the down payment product here to be available for the wizard
         self.dp_product = self.env['product.product'].create({
-            'name': 'Down Payment',
-            'type': 'service',
-            'purchase_ok': True,
-            'sale_ok': False,
-            'taxes_id': False,
+            'name': 'Down Payment', 'type': 'service', 'purchase_ok': True
         })
 
     def init_purchase(self, confirm=False, products=None):
@@ -108,7 +103,6 @@ class TestBillMatching(common.TransactionCase):
         action = match_lines.action_add_to_po()
         context = dict(action['context'], active_ids=match_lines.ids)
 
-        # Use unittest.mock.patch to safely mock the method
         with patch('odoo.addons.purchase_bill_matching.wizard.bill_to_po_wizard.BillToPoWizard._get_downpayment_product', return_value=self.dp_product):
             wizard = self.env['bill.to.po.wizard'].with_context(context).create({'purchase_order_id': po.id})
             wizard.action_add_downpayment()
@@ -116,8 +110,8 @@ class TestBillMatching(common.TransactionCase):
         po_dp_line = po.order_line.filtered(lambda l: l.is_downpayment and l.display_type is False)
         self.assertTrue(po_dp_line, "Down payment line should be created on the PO.")
         self.assertEqual(len(po_dp_line), 1, "There should be only one accountable down payment line.")
-        self.assertEqual(po_dp_line.price_unit, -69.00)
-        self.assertEqual(po_dp_line.product_qty, 1)
+        self.assertEqual(po_dp_line.price_unit, 69.00) # Price is positive
+        self.assertEqual(po_dp_line.product_qty, -1)  # Quantity is negative
 
         po.order_line.filtered(lambda l: not l.is_downpayment)[0].qty_received = 1
         action_view_bill = po.action_create_invoice()

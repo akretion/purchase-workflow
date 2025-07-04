@@ -23,7 +23,6 @@ class BillToPoWizard(models.TransientModel):
                 'type': 'service',
                 'purchase_ok': True,
                 'sale_ok': False,
-                # In v16, for a service product, purchase_method defaults to 'purchase', which is correct for down payments.
                 'taxes_id': False,
             })
         return dp_product
@@ -62,8 +61,8 @@ class BillToPoWizard(models.TransientModel):
             {
                 'name': _("Down Payment: %s", line.move_id.name or line.name),
                 'product_id': dp_product.id,
-                'product_qty': 1,
-                'price_unit': -line.price_subtotal,  # Negative price to represent a deduction
+                'product_qty': -1,  # Use negative quantity for deduction
+                'price_unit': line.price_subtotal, # Use positive price
                 'is_downpayment': True,
                 'order_id': self.purchase_order_id.id,
                 'product_uom': dp_product.uom_po_id.id,
