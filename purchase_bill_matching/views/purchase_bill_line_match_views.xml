@@ -4,6 +4,13 @@
         <field name="name">purchase.bill.line.match.tree</field>
         <field name="model">purchase.bill.line.match</field>
         <field name="arch" type="xml">
+            <!--
+                The structure is simplified to be Odoo 16 compliant.
+                The header inside the tree is not standard in this context.
+                Buttons for actions are typically defined on the ir.actions.act_window record.
+                For simplicity, we remove the header from the tree view itself.
+                The 'column_invisible' attribute is replaced with 'invisible="1"'.
+            -->
             <tree string="Purchase Bill Lines"
                   decoration-info="pol_id != False"
                   decoration-muted="state == 'draft'"
@@ -14,8 +21,14 @@
                     <button name="action_match_lines" type="object" string="Match" groups="account.group_account_invoice" class="btn btn-primary"/>
                     <button name="action_add_to_po" type="object" string="Add to PO" groups="purchase.group_purchase_user"/>
                 </header>
-                <field name="partner_id" string="Vendor" optional="hidden"/>
-                <field name="reference" widget="handle"/>
+                <!-- Invisible fields required for decorations -->
+                <field name="pol_id" invisible="1"/>
+                <field name="state" invisible="1"/>
+                <field name="product_id" invisible="1"/>
+
+                <field name="sequence" widget="handle"/>
+                <field name="partner_id" string="Vendor" optional="hide"/>
+                <field name="reference"/>
                 <field name="display_name" string="Product Description" decoration-it="not product_id"/>
                 <field name="product_uom_qty" string="Qty"/>
                 <field name="product_uom_id" groups="uom.group_uom" string="Unit"/>
@@ -23,8 +36,17 @@
                 <field name="qty_invoiced" optional="hidden"/>
                 <field name="billed_amount_untaxed" widget="monetary" sum="Total Billed" string="Billed"/>
                 <field name="purchase_amount_untaxed" widget="monetary" sum="Total Purchased" string="Purchased"/>
-                <field name="currency_id" column_invisible="1"/>
+                <field name="currency_id" invisible="1"/>
             </tree>
         </field>
     </record>
+
+    <record id="action_purchase_bill_matching_view" model="ir.actions.act_window">
+        <field name="name">Purchase Matching</field>
+        <field name="res_model">purchase.bill.line.match</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="purchase_bill_line_match_tree"/>
+        <field name="target">current</field>
+    </record>
+
 </odoo>

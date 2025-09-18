@@ -7,7 +7,10 @@ class PurchaseBillMatch(models.Model):
     _name = "purchase.bill.line.match"
     _description = "Purchase Line and Vendor Bill line matching view"
     _auto = False
-    _order = 'product_id, aml_id, pol_id'
+    _order = 'sequence, product_id, aml_id, pol_id'
+
+    # Add sequence for manual ordering in the view
+    sequence = fields.Integer(string='Sequence', default=10)
 
     pol_id = fields.Many2one(comodel_name='purchase.order.line', readonly=True)
     aml_id = fields.Many2one(comodel_name='account.move.line', readonly=True)
@@ -89,12 +92,13 @@ class PurchaseBillMatch(models.Model):
                    NULL as account_move_id,
                    pol.price_subtotal as line_amount_untaxed,
                    pol.currency_id as currency_id,
-                   po.state as state
+                   po.state as state,
+                   pol.sequence as sequence
               FROM purchase_order_line pol
          LEFT JOIN purchase_order po ON pol.order_id = po.id
              WHERE pol.state in ('purchase', 'done')
                AND (pol.product_qty > pol.qty_invoiced
-                OR (pol.is_downpayment AND pol.qty_invoiced > 0))
+                OR (pol.is_downpayment AND pol.qty_invoiced != 0))
         """
 
     @api.model
@@ -113,7 +117,8 @@ class PurchaseBillMatch(models.Model):
                    am.id as account_move_id,
                    aml.price_subtotal as line_amount_untaxed,
                    aml.currency_id as currency_id,
-                   am.state as state
+                   am.state as state,
+                   aml.sequence as sequence
               FROM account_move_line aml
          LEFT JOIN account_move am on aml.move_id = am.id
              WHERE aml.display_type = 'product'
@@ -162,7 +167,6 @@ class PurchaseBillMatch(models.Model):
         if len(self.aml_id.move_id) > 1:
             raise UserError(_("You can't select lines from multiple Vendor Bill to do the matching."))
 
-        # Fix: Replace .grouped() with a defaultdict implementation
         pol_by_product = defaultdict(lambda: self.env['purchase.order.line'])
         for line in self.pol_id:
             pol_by_product[line.product_id] |= line

@@ -71,11 +71,11 @@ class BillToPoWizard(models.TransientModel):
             for line in aml_ids
         ]
 
-        # This creates the down payment line(s) on the purchase order
+        # The lines are created and linked to the PO automatically.
         self.purchase_order_id._create_downpayments(po_lines_vals)
 
-        # We do not link the original bill line to the new PO line.
-        # This ensures qty_invoiced on the new PO line is 0, making qty_to_invoice = -1.
+        # Do NOT link the original bill line to the new PO line here.
+        # This was the source of the calculation error.
 
         action = self.env["ir.actions.actions"]._for_xml_id("purchase.purchase_form_action")
         action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]

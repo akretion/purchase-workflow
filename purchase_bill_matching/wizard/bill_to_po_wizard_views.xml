@@ -7,7 +7,10 @@
             <form string="Add to PO">
                 <sheet>
                     <group>
+                        <!-- Add invisible fields required for attrs -->
+                        <field name="has_products" invisible="1"/>
                         <field name="partner_id" invisible="1"/>
+
                         <field name="purchase_order_id"
                                domain="[('partner_id', '=', partner_id), ('state', 'in', ['purchase'])]"
                                placeholder="or create new"
