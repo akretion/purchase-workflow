@@ -1,7 +1,7 @@
 # Copyright 2020 Akretion
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class BidSelectionWizard(models.TransientModel):
@@ -58,7 +58,7 @@ class BidSelectionWizard(models.TransientModel):
 
         # 3. Put unselected requisition lines in a new remainder requisition:
         remainder_req = self.requisition_id.copy(
-            {'origin': 'remainder of %s' % (self.requisition_id.name,)}
+            {"origin": "remainder of %s" % (self.requisition_id.name,)}
         )
 
         if not len(remainder_req.line_ids):

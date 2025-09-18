@@ -1,38 +1,54 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
 
-    <record id="purchase_order_search" model="ir.ui.view">
-      <field name="name">purchase.order.search for Bid selection</field>
-      <field name="model">purchase.order</field>
-      <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
-      <field name="arch" type="xml">
-          <xpath expr="//filter[@name='draft']" position="after">
-              <filter name="is_filled" string="Cotação preenchida" domain="[('is_filled', '=', True), ('state', 'in', ('draft', 'sent', 'to approve'))]"/>
-          </xpath>
-      </field>
+    <record id="purchase_order_line_search" model="ir.ui.view">
+        <field name="name">purchase.order.line.search for Bid Selection</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_search" />
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='groupby_supplier']" position="before">
+                <filter
+                    name="groupby_bid_selection"
+                    string="Bid Selection"
+                    context="{'group_by' : 'bid_selection'}"
+                />
+            </xpath>
+        </field>
     </record>
 
     <record id="purchase_order_line_bid_selection_view_tree" model="ir.ui.view">
         <field name="name">purchase.order.line.tree for Bid selection</field>
         <field name="model">purchase.order.line</field>
         <field name="arch" type="xml">
-            <tree decoration-info="is_lowest_price_line == True and bid_selection != 'selected'"
-                  decoration-success="bid_selection == 'selected'"
-                  decoration-muted="bid_selection == 'rejected'" create="false">
+            <tree
+                decoration-info="is_lowest_price_line == True and bid_selection != 'selected'"
+                decoration-success="bid_selection == 'selected'"
+                decoration-muted="bid_selection == 'rejected'"
+                create="false"
+            >
                 <field name="order_id" />
                 <field name="name" />
-		<field name="partner_id" />
-		<field name="is_filled" />
+                <field name="partner_id" />
+                <field name="is_filled" />
                 <field name="price_unit" />
                 <field name="product_qty" />
                 <field name="price_subtotal" />
                 <field name="date_planned" />
                 <field name="bid_selection" string="Bid" />
                 <field name="is_lowest_price_line" invisible="1" />
-                <button name="action_select_bid" type="object" icon="fa-check"
-                        string="Select" />
-                <button name="action_reject_bid" type="object" icon="fa-times"
-                        string="Reject" />
+                <button
+                    name="action_select_bid"
+                    type="object"
+                    icon="fa-check"
+                    string="Select"
+                />
+                <button
+                    name="action_reject_bid"
+                    type="object"
+                    icon="fa-times"
+                    string="Reject"
+                />
             </tree>
         </field>
     </record>
@@ -41,8 +57,10 @@
     <record id="purchase_order_line_bid_wizard_tree" model="ir.ui.view">
         <field name="name">purchase.order.line.tree for Bid selection Wizard</field>
         <field name="model">purchase.order.line</field>
-        <field name="inherit_id"
-               ref="purchase_requisition_selection.purchase_order_line_bid_selection_view_tree" />
+        <field
+            name="inherit_id"
+            ref="purchase_requisition_selection.purchase_order_line_bid_selection_view_tree"
+        />
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <!-- Hide bid selection fields -->
@@ -62,25 +80,16 @@
         </field>
     </record>
 
-    <record id="purchase_order_line_search" model="ir.ui.view">
-        <field name="name">purchase.order.line.search for Bid Selection</field>
-        <field name="model">purchase.order.line</field>
-        <field name="inherit_id" ref="purchase.purchase_order_line_search" />
-        <field name="mode">primary</field>
-        <field name="arch" type="xml">
-            <xpath expr="//filter[@name='groupby_supplier']" position="before">
-                <filter name="groupby_bid_selection" string="Bid Selection"
-                        context="{'group_by' : 'bid_selection'}" />
-            </xpath>
-        </field>
-    </record>
-
     <record id="action_confirm_bid_selection" model="ir.actions.server">
         <field name="name">Confirm Bid Selection</field>
-        <field name="model_id"
-               ref="purchase_requisition_selection.model_purchase_order_line" />
-        <field name="binding_model_id"
-               ref="purchase_requisition_selection.model_purchase_order_line" />
+        <field
+            name="model_id"
+            ref="purchase_requisition_selection.model_purchase_order_line"
+        />
+        <field
+            name="binding_model_id"
+            ref="purchase_requisition_selection.model_purchase_order_line"
+        />
         <field name="binding_type">action</field>
         <field name="state">code</field>
         <field name="code">

@@ -1,32 +1,20 @@
 # Copyright 2020 Akretion LTDA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models
-
-
-class PurchaseOrder(models.Model):
-    _inherit = "purchase.order"
-
-    is_filled = fields.Boolean(default=False, compute='_compute_is_filled', store=True) # True if supplier set price once
-
-    @api.depends('order_line.is_filled')
-    def _compute_is_filled(self):
-        for po in self:
-            po.is_filled = any(l.is_filled for l in po.order_line)
+from odoo import _, fields, models
 
 
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
-    requisition_line_id = fields.Many2one(comodel_name="purchase.requisition.line")
-
     # Technical field in order to hide unwanted order_line
     active = fields.Boolean(default=True)
+
+    requisition_line_id = fields.Many2one(comodel_name="purchase.requisition.line")
 
     is_lowest_price_line = fields.Boolean(default=False)
 
     bid_selection = fields.Selection(
-        string="Bid Selection",
         selection=[
             ("unselected", "Unselected"),
             ("selected", "Selected"),
@@ -35,15 +23,14 @@ class PurchaseOrderLine(models.Model):
         default="unselected",
     )
 
-    is_filled = fields.Boolean(default=False) # True if supplier set price once
+    # True if supplier set price once
+    is_filled = fields.Boolean(default=False)
 
     def action_select_bid(self):
-        for line in self:
-            line.bid_selection = "selected"
+        self.write({"bid_selection": "selected"})
 
     def action_reject_bid(self):
-        for line in self:
-            line.bid_selection = "rejected"
+        self.write({"bid_selection": "rejected"})
 
     def action_bid_selection(self):
         """Action triggered by server action in Bid Selection tree view
@@ -61,7 +48,9 @@ class PurchaseOrderLine(models.Model):
         return {
             "name": _("Confirm Bid Selection"),
             "type": "ir.actions.act_window",
-            "view_id": self.env.ref("purchase_requisition_selection.bid_selection_wizard_view_form").id,
+            "view_id": self.env.ref(
+                "purchase_requisition_selection.bid_selection_wizard_view_form"
+            ).id,
             "view_mode": "form",
             "res_model": "bid.selection.wizard",
             "target": "new",

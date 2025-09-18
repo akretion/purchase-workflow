@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <record id="bid_selection_wizard_view_form" model="ir.ui.view">
         <field name="name">bid.selection.wizard.form</field>
@@ -7,10 +7,12 @@
             <form>
                 <sheet>
                     <group>
-                      <field name="requisition_id" readonly="1"/>
-                        <field name="selected_line_ids" 
-                               context="{'tree_view_ref': 'purchase_requisition_selection.purchase_order_line_bid_wizard_tree'}"
-                               readonly="1" />
+                      <field name="requisition_id" readonly="1" />
+                        <field
+                            name="selected_line_ids"
+                            context="{'tree_view_ref': 'purchase_requisition_selection.purchase_order_line_bid_wizard_tree'}"
+                            readonly="1"
+                        />
                     </group>
                     <footer>
                         <button
