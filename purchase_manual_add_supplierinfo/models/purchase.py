@@ -65,6 +65,7 @@ class PurchaseOrderLine(models.Model):
                 "default_product_id": self.product_id.id,
                 "default_price": self.price_unit,
                 "default_name": self.partner_id.commercial_partner_id.id,
+                "default_product_code": self._get_default_product_code(),
                 "default_min_qty": 0.0,
                 "default_delay": 1.0,
             },
@@ -74,3 +75,10 @@ class PurchaseOrderLine(models.Model):
             "views": [(False, "form")],
             "target": "new",
         }
+
+    def _get_default_product_code(self):
+        product_code = self.product_id.supplierinfo_group_ids.filtered(
+            lambda r: r.product_id == self.product_id
+            and r.partner_id == self.order_id.partner_id
+        ).product_code
+        return product_code
