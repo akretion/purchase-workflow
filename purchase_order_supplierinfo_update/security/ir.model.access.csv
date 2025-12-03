@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_wizard_update_purchase_supplierinfo,access_wizard_update_purchase_supplierinfo,model_wizard_update_purchase_supplierinfo,base.group_user,1,1,1,1
+access_wizard_update_purchase_supplierinfo_line,access_wizard_update_purchase_supplierinfo_line,model_wizard_update_purchase_supplierinfo_line,base.group_user,1,1,1,1
