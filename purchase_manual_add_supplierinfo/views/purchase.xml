@@ -9,7 +9,7 @@
                 <button
                     name="update_supplierinfo"
                     type="object"
-                    string="Update supplierinfo"
+                    string="Create supplierinfo"
                     class="oe_highlight"
                     attrs="{'invisible': ['|', ('state', 'not in', ('purchase', 'done')), ('all_supplierinfo_ok', '!=', False)]}"
                 />
@@ -24,7 +24,7 @@
                     type="object"
                     icon="fa-database"
                     attrs="{'invisible': ['|', ('state', 'not in', ('purchase', 'done')), ('supplierinfo_ok', '!=', False)]}"
-                    title="Update supplierinfo"
+                    title="Create supplierinfo"
                 />
             </xpath>
         </field>

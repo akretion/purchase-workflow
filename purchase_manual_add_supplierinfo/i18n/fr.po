@@ -74,8 +74,8 @@ msgstr "Prix Fournisseur"
 
 #. module: purchase_manual_add_supplierinfo
 #: model_terms:ir.ui.view,arch_db:purchase_manual_add_supplierinfo.purchase_order_form
-msgid "Update supplierinfo"
-msgstr "Mise à jour prix fournisseurs"
+msgid "Create supplierinfo"
+msgstr "Creation prix fournisseurs"
 
 #. module: purchase_manual_add_supplierinfo
 #: model:ir.model.fields,field_description:purchase_manual_add_supplierinfo.field_purchase_order__all_supplierinfo_ok
