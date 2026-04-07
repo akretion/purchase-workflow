@@ -15,6 +15,8 @@ class PurchaseOrderLine(models.Model):
         for line in self:
             line.supplierinfo_price_exist = False
             line.supplierinfo_price_ok = False
+            if not line.product_id:
+                continue
             supplierinfos = line.product_id._select_seller(
                 line.order_id.partner_id.commercial_partner_id,
                 quantity=None,
