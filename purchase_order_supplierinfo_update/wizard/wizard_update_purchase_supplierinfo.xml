@@ -10,19 +10,23 @@
                 </group>
                 <separator string="List of products to update" />
                 <field name="line_ids">
-                    <tree
-                        create="false"
-                        editable="bottom"
-                        decoration-info="not supplierinfo_id"
-                    >
+                    <tree create="false" editable="bottom">
                         <field name="product_id" />
                         <field name="supplierinfo_id" />
                         <field
                             name="current_price"
-                            attrs="{'invisible': [('supplierinfo_id', '=', 'False')]}"
+                            attrs="{'invisible': [('supplierinfo_id', '=', False)]}"
                             optional="show"
                         />
                         <field name="new_price" optional="show" />
+                        <field name="current_min_qty" />
+                        <field name="new_min_qty" />
+                        <field name="current_date_start" />
+                        <field name="new_date_start" />
+                        <field name="current_date_end" />
+                        <field name="new_date_end" />
+                        <field name="current_delay" />
+                        <field name="new_delay" />
                     </tree>
                 </field>
                 <footer>

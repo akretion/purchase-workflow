@@ -1,6 +1,6 @@
-# Copyright 2025 Akretion (https://www.akretion.com).
-# @author Mathieu DELVA <mathieu.delva@akretion.com>
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+# © 2026 Mathieu DELVA @ Akretion
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 {
     "name": "Purchase Order Supplierinfo Update",
     "summary": "Update product supplierinfo with the last purchase price",
