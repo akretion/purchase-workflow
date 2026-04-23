@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 
 class PurchaseOrder(models.Model):
@@ -27,28 +28,39 @@ class PurchaseOrder(models.Model):
         self.ensure_one()
         lines = []
         product_ids = []
-
-        for line in self.order_line.filtered(lambda x: x.product_id):
-            if line.product_id.id in product_ids:
-                continue
-
-            product_ids.append(line.product_id.id)
+        for line in self.order_line.filtered(
+            lambda r: r.product_id and not r.supplierinfo_price_ok
+        ):
 
             supplierinfo = line.product_id._select_seller(
-                line.order_id.partner_id.commercial_partner_id, quantity=None
+                partner_id=line.order_id.partner_id.commercial_partner_id,
+                quantity=line.product_qty,
+                date=line.order_id.date_order.date(),
+                uom_id=line.product_uom,
+            )
+            if any(
+                d["product_id"] == line.product_id.id
+                and d["supp_info"] == supplierinfo.id
+                for d in product_ids
+            ):
+                continue
+            product_ids.append(
+                {"supp_info": supplierinfo.id, "product_id": line.product_id.id}
             )
 
             if supplierinfo:
                 if line._is_matching_supplierinfo(supplierinfo):
                     continue
 
-            lines.append((0, 0, line._prepare_supplier_wizard_line(supplierinfo)))
+                lines.append((0, 0, line._prepare_supplier_wizard_line(supplierinfo)))
         return lines
 
     def supplierinfo_update_price(self):
         self.ensure_one()
         lines_for_update = self._get_update_supplierinfo_lines()
-        if lines_for_update:
+        if not lines_for_update:
+            raise UserError(_("No lines found to update."))
+        else:
             ctx = {
                 "default_line_ids": lines_for_update,
                 "default_purchase_id": self.id,

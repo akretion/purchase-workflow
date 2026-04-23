@@ -29,9 +29,26 @@ class WizardUpdatePurchaseSupplierinfoLine(models.TransientModel):
         required=True,
     )
 
+    current_min_qty = fields.Float(related="supplierinfo_id.min_qty", readonly=True)
+    new_min_qty = fields.Float(string="New Quantity")
+    current_date_start = fields.Date(
+        related="supplierinfo_id.date_start", readonly=True
+    )
+    new_date_start = fields.Date()
+
+    current_date_end = fields.Date(related="supplierinfo_id.date_end", readonly=True)
+    new_date_end = fields.Date()
+
+    current_delay = fields.Integer(related="supplierinfo_id.delay", readonly=True)
+    new_delay = fields.Integer()
+
     def _prepare_supplierinfo_update(self):
         self.ensure_one()
         res = {
             "price": self.new_price,
+            "min_qty": self.new_min_qty,
+            "date_start": self.new_date_start,
+            "date_end": self.new_date_end,
+            "delay": self.new_delay,
         }
         return res

@@ -18,8 +18,14 @@ class PurchaseOrderLine(models.Model):
             if not line.product_id:
                 continue
             supplierinfos = line.product_id._select_seller(
-                line.order_id.partner_id.commercial_partner_id,
-                quantity=None,
+                partner_id=line.order_id.partner_id.commercial_partner_id,
+                quantity=line.product_qty,
+                date=(
+                    line.order_id.date_order.date()
+                    if line.order_id.date_order
+                    else fields.Date.today()
+                ),
+                uom_id=line.product_uom,
             )
             if supplierinfos:
                 line.supplierinfo_price_exist = True
@@ -46,6 +52,9 @@ class PurchaseOrderLine(models.Model):
         return {
             "product_id": self.product_id.id,
             "supplierinfo_id": supplierinfo and supplierinfo.id or False,
-            "current_price": supplierinfo and supplierinfo.price or False,
             "new_price": self.price_unit,
+            "new_min_qty": supplierinfo.min_qty if supplierinfo else 0,
+            "new_date_start": supplierinfo.date_start if supplierinfo else False,
+            "new_date_end": supplierinfo.date_end if supplierinfo else False,
+            "new_delay": supplierinfo.delay if supplierinfo else 0,
         }
