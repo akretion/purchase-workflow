@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_purchase_order_form" model="ir.ui.view">
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button
+                    name="supplierinfo_update_price"
+                    string="Update Supplier Price"
+                    class="oe_highlight"
+                    type="object"
+                    attrs="{'invisible': ['|', ('state', 'not in', ('purchase', 'done')), ('all_supplierinfo_price_ok', '!=', False)]}"
+                />
+            </xpath>
+            <field name="fiscal_position_id" position="after">
+                <field name="all_supplierinfo_price_ok" invisible="True" />
+            </field>
+            <xpath
+                expr="//field[@name='order_line']//tree/field[@name='price_subtotal']"
+                position="after"
+            >
+                <field name="supplierinfo_price_ok" invisible="True" />
+            </xpath>
+        </field>
+    </record>
+</odoo>
