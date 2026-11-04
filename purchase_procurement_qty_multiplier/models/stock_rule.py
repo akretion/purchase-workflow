@@ -1,4 +1,5 @@
 from math import ceil
+
 from odoo import _, models
 
 
@@ -35,7 +36,7 @@ class StockRule(models.Model):
                     {
                         "multiplier_qty": seller.multiplier_qty,
                         "uom_name": seller.product_uom.name,
-                        "new_product_qty": self.product_qty,
+                        "new_product_qty": vals["product_qty"],
                     }
                 ),
             )
