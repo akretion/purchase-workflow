@@ -60,3 +60,11 @@ class PurchaseOrderLine(models.Model):
             | returns
             | returns.returned_move_ids
         )
+
+    def _prepare_stock_moves(self, picking):
+        values_list = super()._prepare_stock_moves(picking)
+        if self.order_id._is_transit_purchase():
+            for values in values_list:
+                values["transit_move_dest_ids"] = values.get("move_dest_ids") or False
+                values["move_dest_ids"] = False
+        return values_list

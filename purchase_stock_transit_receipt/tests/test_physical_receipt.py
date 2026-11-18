@@ -16,6 +16,20 @@ class TestPhysicalReceipt(TransitReceiptCommon):
         with self.assertRaises(UserError):
             self._validate(physical_receipt)
 
+    def test_cancelled_with_transit_receipt(self):
+        purchase = self._create_purchase()
+        transit_receipt = purchase.picking_ids
+        physical_receipt = self._next_picking(transit_receipt)
+        transit_receipt.action_cancel()
+        self.assertEqual(physical_receipt.state, "cancel")
+
+    def test_kept_when_transit_receipt_backorder_cancelled(self):
+        purchase = self._create_purchase()
+        transit_receipt = purchase.picking_ids
+        self._validate(transit_receipt, quantity=2)
+        transit_receipt.backorder_ids.action_cancel()
+        self.assertEqual(self._next_picking(transit_receipt).state, "assigned")
+
     def test_blocked_beyond_quantity_in_transit(self):
         purchase = self._create_purchase()
         transit_receipt = purchase.picking_ids

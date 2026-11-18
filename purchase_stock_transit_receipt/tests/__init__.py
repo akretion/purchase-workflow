@@ -1,3 +1,4 @@
+from . import test_procurement
 from . import test_purchase_order
 from . import test_physical_receipt
 from . import test_qty_received
